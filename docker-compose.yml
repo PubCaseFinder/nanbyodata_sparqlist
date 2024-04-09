@@ -1,0 +1,11 @@
+version: '3'
+services:
+  sparqlist:
+    container_name: ${CONTAINER_NAME:-nanbyodata-sparqlist}
+    image: ${IMAGE_NAME:-dbcls/sparqlist}
+    volumes:
+      - ${REPOSITORY:-./repository}:/app/repository
+    ports:
+      - ${PORT:-3000}:3000
+    environment:
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-sercret}
