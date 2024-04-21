@@ -15,17 +15,16 @@ https://pubcasefinder-rdf.dbcls.jp/sparql
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT *
+SELECT DISTINCT ?mondo_id
+FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>
+FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/mondo>
 WHERE {
   ?nando a owl:Class ;
-         dcterms:identifier "NANDO:{{nando_id}}" .
+    dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
     ?nando skos:closeMatch ?mondo .
     ?mondo oboInOwl:id ?mondo_id
@@ -61,25 +60,24 @@ https://pubcasefinder-rdf.dbcls.jp/sparql
 ## `medgen` retrieve information from medgen
 
 ```sparql
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix mo: <http://med2rdf/ontology/medgen#>
 prefix obo: <http://purl.obolibrary.org/obo/>
-prefix nci: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
-prefix dct: <http://purl.org/dc/terms/>
+prefix dcterms: <http://purl.org/dc/terms/>
 
 SELECT DISTINCT ?medgen ?concept ?concept_id ?concept_name ?definition (GROUP_CONCAT(?label, ":") AS ?labels) ?mondo_uri AS ?mondo
+FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/medgen>
 WHERE {
   VALUES ?mondo_uri { {{mondo_uri_list}} }
   ?mgconso rdfs:seeAlso ?mondo_uri ;
-    dct:source mo:MONDO ;
+    dcterms:source mo:MONDO ;
     rdfs:label ?label .
   ?concept a mo:ConceptID ;
     mo:mgconso ?mgconso ;
     skos:definition ?definition ;
     rdfs:label ?concept_name ;
-    dct:identifier ?concept_id .
+    dcterms:identifier ?concept_id .
   ?medgen rdfs:seeAlso ?concept .        
 }
 GROUP BY ?medgen ?concept ?definition ?concept_id ?concept_name ?mondo_uri
@@ -94,24 +92,25 @@ https://pubcasefinder-rdf.dbcls.jp/sparql
 ## `inheritance` retrieve inheritances associated with the mondo uri
 
 ```sparql
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX sio: <http://semanticscience.org/resource/>
-PREFIX mondo: <http://purl.obolibrary.org/obo/>
-PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
 PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 
-SELECT distinct ?inheritance ?inheritance_ja WHERE{
+SELECT DISTINCT ?inheritance ?inheritance_ja
+FROM <https://pubcasefinder.dbcls.jp/rdf/pcf>
+WHERE{
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
   {{/if}}
 
   ?disease rdfs:seeAlso ?mondo_uri ;
-           nando:hasInheritance ?inheritance .
-  optional { ?inheritance rdfs:label ?inheritance_ja . FILTER (lang(?inheritance_ja) = "ja") }
+    nando:hasInheritance ?inheritance .
+  OPTIONAL {
+    ?inheritance rdfs:label ?inheritance_ja .
+    FILTER (lang(?inheritance_ja) = "ja")
+  }
 }
-order by ?inheritance
+ORDER BY ?inheritance
 ```
 
 ## Endpoint
@@ -127,14 +126,13 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
-PREFIX mondo: <http://purl.obolibrary.org/obo/mondo#>
-PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 
 SELECT DISTINCT ?nando ?nando_id ?label_ja ?label_hira ?label_en ?alt_label_ja ?alt_label_en ?notification_number 
-                ?source ?description ?mondo ?mondo_id ?mondo_description ?site ?db_xref ?altLabel
+                ?source ?description ?mondo ?mondo_id ?mondo_description ?site ?db_xref ?altlabel
+FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>
+FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/mondo>
 WHERE {
   ?nando a owl:Class ;
     dcterms:identifier "NANDO:{{nando_id}}" .
@@ -184,6 +182,12 @@ WHERE {
 ## Output
 
 ```javascript
+/** 引数:1200005 では返ってこないobjectのデータ(テストが終わったら消す事) 
+* descritpion: 1200001
+* shouman: 2200001
+* kegg: 2200053
+* urdbms: 1200948
+**/
 ({
   json({result, medgen, inheritance}) {
     let rows = result.results.bindings;
