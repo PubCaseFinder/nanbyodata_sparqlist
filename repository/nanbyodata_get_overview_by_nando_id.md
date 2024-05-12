@@ -102,7 +102,8 @@ PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
 PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 
-SELECT distinct ?inheritance ?inheritance_ja WHERE{
+SELECT distinct ?inheritance ?inheritance_ja ?inheritance_en
+WHERE{
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
   {{/if}}
@@ -110,6 +111,7 @@ SELECT distinct ?inheritance ?inheritance_ja WHERE{
   ?disease rdfs:seeAlso ?mondo_uri ;
            nando:hasInheritance ?inheritance .
   optional { ?inheritance rdfs:label ?inheritance_ja . FILTER (lang(?inheritance_ja) = "ja") }
+  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
 }
 order by ?inheritance
 ```
@@ -215,18 +217,22 @@ WHERE {
         if (data.alt_label_en) {
           if (!data.alt_label_en.includes(rows[i].alt_label_en.value)) {
             data.alt_label_en.push(rows[i].alt_label_en.value);
+            data.alt_label_en.sort((a, b) => a.localeCompare(b));
           }
         } else {
           data.alt_label_en = [rows[i].alt_label_en.value];
+          data.alt_label_en.sort((a, b) => a.localeCompare(b));
         }
       };
       if (rows[i].alt_label_ja) {
         if (data.alt_label_ja) {
           if (!data.alt_label_ja.includes(rows[i].alt_label_ja.value)) {
             data.alt_label_ja.push(rows[i].alt_label_ja.value);
+            data.alt_label_ja.sort((a, b) => a.localeCompare(b, 'ja'));
           }
         } else {
           data.alt_label_ja = [rows[i].alt_label_ja.value];
+          data.alt_label_ja.sort((a, b) => a.localeCompare(b, 'ja'));
         }
       };
       if (rows[i].notification_number) {
@@ -259,10 +265,12 @@ WHERE {
           case /kegg/.test(rows[i].site.value):
             data.kegg = {id: rows[i].site.value.split("/").slice(-1)[0].replace('www_bget?ds_ja:',''),
                             url: rows[i].site.value};
+            
             break;
           case /UR-DBMS/.test(rows[i].site.value):
             data.urdbms = {id: rows[i].site.value.split("/").slice(-1)[0].replace('SyndromeDetail.php?winid=1&recid=',''),
                             url: rows[i].site.value};
+            
             break;
         }
       }
@@ -334,12 +342,14 @@ WHERE {
         for (let i = 0; i < medgen_data[0].labels.length; i++) {
           if (!data.alt_label_en.includes(medgen_data[0].labels[i])) {
             data.alt_label_en.push(medgen_data[0].labels[i]);
+            data.alt_label_en.sort((a, b) => a.localeCompare(b));
           }
         }
       } else {
         data.alt_label_en = [];
-        for (let i = 0; i < medgen_data[0].labels.length; i++) {
+                for (let i = 0; i < medgen_data[0].labels.length; i++) {
           data.alt_label_en.push(medgen_data[0].labels[i]);
+          data.alt_label_en.sort((a, b) => a.localeCompare(b));
         }
       }
       data.medgen_id = medgen_data[0].medgen_id;
@@ -354,14 +364,15 @@ WHERE {
       for (let i = 0; i < inheritance_rows.length; i++ ) {
         inheritance_uri = inheritance_rows[i].inheritance.value
         inheritance_ja = inheritance_rows[i].inheritance_ja.value
+        inheritance_en = inheritance_rows[i].inheritance_en.value
         if (data.inheritance_uris) {
           if (!inheritance_uris.includes(inheritance_uri)) {
-            data.inheritance_uris.push({uri: inheritance_uri, id: inheritance_ja});
+            data.inheritance_uris.push({uri: inheritance_uri, id: inheritance_ja, id_en:inheritance_en});
             inheritance_uris.push(inheritance_uri);
           }
         } else {
           data.inheritance_uris = [];
-          data.inheritance_uris.push({uri: inheritance_uri, id: inheritance_ja});
+          data.inheritance_uris.push({uri: inheritance_uri, id: inheritance_ja, id_en:inheritance_en});
           inheritance_uris.push(inheritance_uri);
         }
       }
@@ -370,9 +381,12 @@ WHERE {
     }
   })
 
+
 ```
 
+
 ## Description
+- 2024/04/24 inheritanceの英語ラベルが取れるように変更、シノニムのソートを追加
 - 2024/03/21 タイトルを変更　旧：nanbyodata_get_metadata　及び　SPARQL修正
 - 現在NanbyouDataの表示で疾患のメタ情報を表示する部分に利用しています。
 - 過去のUIからの変遷の結果、部分的に必要の無いパートがあるので、それについての調整中(済）
