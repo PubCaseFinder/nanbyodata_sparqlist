@@ -190,189 +190,132 @@ WHERE {
 **/
 ({
   json({result, medgen, inheritance}) {
-    let rows = result.results.bindings;
-    let medgen_rows = medgen.results.bindings;
-    let inheritance_rows = inheritance.results.bindings;
-    let data = {};
-    let mondo_ids = [];
-    let db_xrefs = [];
-    let mondo_decs = [];
-    let orpha_ids = [];
-    let omim_ids = [];
-    let gene_uris = [];
-    let inheritance_uris = [];
-    
-    for (let i = 0; i < rows.length ;i++) {
-      if (rows[i].nando_id) {
-        data.nando_id = rows[i].nando_id.value;
-      };
-      if (rows[i].label_en) {
-        data.label_en = rows[i].label_en.value;
-      };
-      if (rows[i].label_ja) {   
-        data.label_ja = rows[i].label_ja.value;
-      };
-      if (rows[i].label_hira) {
-        data.ruby = rows[i].label_hira.value;
-      };
-      if (rows[i].alt_label_en) {
-        if (data.alt_label_en) {
-          if (!data.alt_label_en.includes(rows[i].alt_label_en.value)) {
-            data.alt_label_en.push(rows[i].alt_label_en.value);
-          }
-        } else {
-          data.alt_label_en = [rows[i].alt_label_en.value];
-        }
-      };
-      if (rows[i].alt_label_ja) {
-        if (data.alt_label_ja) {
-          if (!data.alt_label_ja.includes(rows[i].alt_label_ja.value)) {
-            data.alt_label_ja.push(rows[i].alt_label_ja.value);
-          }
-        } else {
-          data.alt_label_ja = [rows[i].alt_label_ja.value];
-        }
-      };
-      if (rows[i].notification_number) {
-        data.notification_number = rows[i].notification_number.value;
-      };
-      if (rows[i].description) {
-        data.description = rows[i].description.value;
-      };
-      if (rows[i].source) {
-        data.source = rows[i].source.value;
-      };
-      if (rows[i].site) {
-        switch (true) {
-          case /entry/.test(rows[i].site.value):
-            data.nanbyou = {id: rows[i].site.value.split("/").slice(-1)[0],
-                            url: rows[i].site.value};
-            break;
-          case /mhlw/.test(rows[i].site.value):
-            data.mhlw = {id: rows[i].site.value.split("/").slice(-1)[0],
-                             url: rows[i].site.value};
-            break;
-          case /wp-content/.test(rows[i].site.value):
-            data.mhlw = {id: rows[i].site.value.split("/").slice(-1)[0],
-                             url: rows[i].site.value};
-            break;
-          case /shouman/.test(rows[i].site.value):
-            data.shouman = {id: rows[i].site.value.split("/").slice(-2)[0],
-                            url: rows[i].site.value};
-            break;
-          case /kegg/.test(rows[i].site.value):
-            data.kegg = {id: rows[i].site.value.split("/").slice(-1)[0].replace('www_bget?ds_ja:',''),
-                            url: rows[i].site.value};
-            break;
-          case /UR-DBMS/.test(rows[i].site.value):
-            data.urdbms = {id: rows[i].site.value.split("/").slice(-1)[0].replace('SyndromeDetail.php?winid=1&recid=',''),
-                            url: rows[i].site.value};
-            break;
-        }
-      }
-      if (rows[i].mondo) {
-        if (data.mondos) {
-          if (!mondo_ids.includes(rows[i].mondo_id.value)) {
-           data.mondos.push({url: rows[i].mondo_id.value.replace("MONDO:", "https://monarchinitiative.org/MONDO:"), id: rows[i].mondo_id.value});
-            mondo_ids.push(rows[i].mondo_id.value);
-          }
-        } else {
-          data.mondos = [];
-          data.mondos.push({url: rows[i].mondo_id.value.replace("MONDO:", "https://monarchinitiative.org/MONDO:"), id: rows[i].mondo_id.value});
-          mondo_ids.push(rows[i].mondo_id.value);
-        }
-        if (rows[i].db_xref) {
-          db_xref_uri = rows[i].db_xref.value ;
-          if (data.db_xrefs) {
-            if (db_xref_uri.match(/Orphanet_/)) {
-              if (!orpha_ids.includes(db_xref_uri)) {
-                data.db_xrefs.orphanet.push({url: db_xref_uri.replace('http://www.orpha.net/ORDO/Orphanet_','https://www.orpha.net/en/disease/detail/'), id: db_xref_uri.split("/").slice(-1)[0].replace('Orphanet_','')});
-                orpha_ids.push(db_xref_uri) ;
-              }
-            } else if (db_xref_uri.match(/omim/)) {
-              if (!omim_ids.includes(db_xref_uri)) {
-                data.db_xrefs.omim.push({url: db_xref_uri.replace('omim','mim'), id: db_xref_uri.split("/").slice(-1)[0]});
-                omim_ids.push(db_xref_uri);
-              }
-            }
-          } else {
-            data.db_xrefs = {orphanet: [], omim: []};
-            if (db_xref_uri.match(/Orphanet_/)) {
-              data.db_xrefs.orphanet.push({url: db_xref_uri.replace('http://www.orpha.net/ORDO/Orphanet_','https://www.orpha.net/en/disease/detail/'), id: db_xref_uri.split("/").slice(-1)[0].replace('Orphanet_','')});
-              orpha_ids.push(db_xref_uri);
-            } else if (db_xref_uri.match(/omim/)) {
-              data.db_xrefs.omim.push({url: db_xref_uri.replace('omim','mim'), id: db_xref_uri.split("/").slice(-1)[0]});
-              omim_ids.push(db_xref_uri);
-            }
-          }
-        }
-        if (data.mondo_decs) {
-          if (!mondo_decs.includes(rows[i].mondo_description.value)) {
-            data.mondo_decs.push({url: rows[i].mondo.value, id: rows[i].mondo_description.value});
-            mondo_decs.push(rows[i].mondo_description.value);
-          }
-        } else {
-          data.mondo_decs = [];
-          data.mondo_decs.push({url: rows[i].mondo.value, id: rows[i].mondo_description.value});
-          mondo_decs.push(rows[i].mondo_description.value);
-        }
-      }
-    }
-    
-    let medgen_data = [];
-    
-    if (medgen_rows.length > 0) {
-      for (let i = 0; i < medgen_rows.length; i++ ) {
-        medgen_data.push({medgen: medgen_rows[i].medgen.value});
-        medgen_data[i].medgen_id = medgen_rows[i].medgen.value.split("/").slice(-1)[0];
-        medgen_data[i].concept = medgen_rows[i].concept.value;
-        medgen_data[i].concept_id = medgen_rows[i].concept_id.value;
-        medgen_data[i].concept_name = medgen_rows[i].concept_name.value;
-        medgen_data[i].definition = medgen_rows[i].definition.value;
-        medgen_data[i].labels = Array.from(new Set(medgen_rows[i].labels.value.split(":")));
-        if (medgen_data[i].labels.indexOf(medgen_rows[i].concept_name.value) != -1) {
-          medgen_data[i].labels.splice(medgen_data[i].labels.indexOf(medgen_rows[i].concept_name.value), 1);
-        }
-      }
-      if (data.alt_label_en) {
-        for (let i = 0; i < medgen_data[0].labels.length; i++) {
-          if (!data.alt_label_en.includes(medgen_data[0].labels[i])) {
-            data.alt_label_en.push(medgen_data[0].labels[i]);
-          }
+    const rows = result.results.bindings;
+    const medgen_rows = medgen.results.bindings;
+    const inheritance_rows = inheritance.results.bindings;
+    const data = {};
+    const mondo_ids = new Set();
+    const mondo_decs = new Set();
+    const inheritance_uris = new Set();
+
+    const addLabel = (data, key, value) => {
+      if (data[key]) {
+        if (!data[key].includes(value)) {
+          data[key].push(value);
         }
       } else {
-        data.alt_label_en = [];
-        for (let i = 0; i < medgen_data[0].labels.length; i++) {
-          data.alt_label_en.push(medgen_data[0].labels[i]);
-        }
+        data[key] = [value];
       }
-      data.medgen_id = medgen_data[0].medgen_id;
-      data.medgen_uri = medgen_data[0].medgen;
-      data.concept = medgen_data[0].concept;
-      data.concept_name = medgen_data[0].concept_name;
-      data.concept_id = medgen_data[0].concept_id;
-      data.medgen_definition = medgen_data[0].definition;
     }
 
-    if (inheritance_rows.length > 0) {
-      for (let i = 0; i < inheritance_rows.length; i++ ) {
-        inheritance_uri = inheritance_rows[i].inheritance.value
-        inheritance_ja = inheritance_rows[i].inheritance_ja.value
-        if (data.inheritance_uris) {
-          if (!inheritance_uris.includes(inheritance_uri)) {
-            data.inheritance_uris.push({uri: inheritance_uri, id: inheritance_ja});
-            inheritance_uris.push(inheritance_uri);
-          }
-        } else {
-          data.inheritance_uris = [];
-          data.inheritance_uris.push({uri: inheritance_uri, id: inheritance_ja});
-          inheritance_uris.push(inheritance_uri);
+    rows.forEach(row => {
+      if (row.nando_id) data.nando_id = row.nando_id.value;
+      if (row.label_en) data.label_en = row.label_en.value;
+      if (row.label_ja) data.label_ja = row.label_ja.value;
+      if (row.label_hira) data.ruby = row.label_hira.value;
+      if (row.alt_label_en) addLabel(data, 'alt_label_en', row.alt_label_en.value);
+      if (row.alt_label_ja) addLabel(data, 'alt_label_ja', row.alt_label_ja.value);
+      if (row.notification_number) data.notification_number = row.notification_number.value;
+      if (row.description) data.description = row.description.value;
+      if (row.source) data.source = row.source.value;
+
+      if (row.site) {
+        const siteValue = row.site.value;
+        const siteId = siteValue.split("/").slice(-1)[0];
+        if (/entry/.test(siteValue)) {
+          data.nanbyou = { id: siteId, url: siteValue };
+        } else if (/mhlw/.test(siteValue) || /wp-content/.test(siteValue)) {
+          data.mhlw = { id: siteId, url: siteValue };
+        } else if (/shouman/.test(siteValue)) {
+          data.shouman = { id: siteValue.split("/").slice(-2)[0], url: siteValue };
+        } else if (/kegg/.test(siteValue)) {
+          data.kegg = { id: siteId.replace('www_bget?ds_ja:', ''), url: siteValue };
+        } else if (/UR-DBMS/.test(siteValue)) {
+          data.urdbms = { id: siteId.replace('SyndromeDetail.php?winid=1&recid=', ''), url: siteValue };
         }
       }
+
+      if (row.mondo) {
+        const mondoId = row.mondo_id.value;
+        if (!mondo_ids.has(mondoId)) {
+          data.mondos = data.mondos || [];
+          data.mondos.push({ url: mondoId.replace("MONDO:", "https://monarchinitiative.org/MONDO:"), id: mondoId });
+          mondo_ids.add(mondoId);
+        }
+
+        if (row.db_xref) {
+          const dbXrefUri = row.db_xref.value;
+          if (!data.db_xrefs) data.db_xrefs = { orphanet: [], omim: [] }
+          if (dbXrefUri.match(/Orphanet_/)) {
+            const id = dbXrefUri.split("/").slice(-1)[0].replace('Orphanet_', '')
+            if (!data.db_xrefs.orphanet.some(v => v.id === id)) {
+              data.db_xrefs.orphanet.push({ url: dbXrefUri.replace('http://www.orpha.net/ORDO/Orphanet_', 'https://www.orpha.net/en/disease/detail/'), id });
+            }
+          } else if (dbXrefUri.match(/omim/)) {
+            const id = dbXrefUri.split("/").slice(-1)[0]
+            if (!data.db_xrefs.omim.some(v => v.id === id)) {
+              data.db_xrefs.omim.push({ url: dbXrefUri.replace('omim', 'mim'), id });
+            }
+          }
+        }
+
+        if (row.mondo_description) {
+          const mondoDescription = row.mondo_description.value;
+          if (!mondo_decs.has(mondoDescription)) {
+            data.mondo_decs = data.mondo_decs || [];
+            data.mondo_decs.push({ url: row.mondo.value, id: mondoDescription });
+            mondo_decs.add(mondoDescription);
+          }
+        }
+      }
+    });
+
+    if (medgen_rows.length > 0) {
+      const medgenData = medgen_rows.map(row => ({
+        medgen: row.medgen.value,
+        medgen_id: row.medgen.value.split("/").slice(-1)[0],
+        concept: row.concept.value,
+        concept_id: row.concept_id.value,
+        concept_name: row.concept_name.value,
+        definition: row.definition.value,
+        labels: Array.from(new Set(row.labels.value.split(":")))
+      }));
+
+      medgenData[0].labels = medgenData[0].labels.filter(label => label !== medgenData[0].concept_name);
+
+      if (data.alt_label_en) {
+        medgenData[0].labels.forEach(label => {
+          if (!data.alt_label_en.includes(label)) {
+            data.alt_label_en.push(label);
+          }
+        });
+      } else {
+        data.alt_label_en = medgenData[0].labels;
+      }
+
+      Object.assign(data, {
+        medgen_id: medgenData[0].medgen_id,
+        medgen_uri: medgenData[0].medgen,
+        concept: medgenData[0].concept,
+        concept_name: medgenData[0].concept_name,
+        concept_id: medgenData[0].concept_id,
+        medgen_definition: medgenData[0].definition
+      });
     }
+
+    inheritance_rows.forEach(row => {
+      const inheritanceUri = row.inheritance.value;
+      const inheritanceJa = row.inheritance_ja.value;
+      if (!inheritance_uris.has(inheritanceUri)) {
+        data.inheritance_uris = data.inheritance_uris || [];
+        data.inheritance_uris.push({ uri: inheritanceUri, id: inheritanceJa });
+        inheritance_uris.add(inheritanceUri);
+      }
+    });
+
     return data;
-    }
-  })
+  }
+})
 
 ```
 
