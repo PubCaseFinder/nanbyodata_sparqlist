@@ -96,19 +96,16 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 
-SELECT DISTINCT ?inheritance ?inheritance_ja
-FROM <https://pubcasefinder.dbcls.jp/rdf/pcf>
+SELECT distinct ?inheritance ?inheritance_ja ?inheritance_en
 WHERE{
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
   {{/if}}
 
   ?disease rdfs:seeAlso ?mondo_uri ;
-    nando:hasInheritance ?inheritance .
-  OPTIONAL {
-    ?inheritance rdfs:label ?inheritance_ja .
-    FILTER (lang(?inheritance_ja) = "ja")
-  }
+           nando:hasInheritance ?inheritance .
+  optional { ?inheritance rdfs:label ?inheritance_ja . FILTER (lang(?inheritance_ja) = "ja") }
+  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
 }
 ORDER BY ?inheritance
 ```
@@ -202,6 +199,7 @@ WHERE {
       if (data[key]) {
         if (!data[key].includes(value)) {
           data[key].push(value);
+          data[key].sort((a, b) => a.localeCompare(b));
         }
       } else {
         data[key] = [value];
@@ -287,6 +285,7 @@ WHERE {
         medgenData[0].labels.forEach(label => {
           if (!data.alt_label_en.includes(label)) {
             data.alt_label_en.push(label);
+            data.alt_label_en.sort((a, b) => a.localeCompare(b));
           }
         });
       } else {
@@ -306,9 +305,10 @@ WHERE {
     inheritance_rows.forEach(row => {
       const inheritanceUri = row.inheritance.value;
       const inheritanceJa = row.inheritance_ja.value;
+      const inheritanceEn = row.inheritance_en.value;
       if (!inheritance_uris.has(inheritanceUri)) {
         data.inheritance_uris = data.inheritance_uris || [];
-        data.inheritance_uris.push({ uri: inheritanceUri, id: inheritanceJa });
+        data.inheritance_uris.push({ uri: inheritanceUri, id: inheritanceJa, id_en: inheritanceEn });
         inheritance_uris.add(inheritanceUri);
       }
     });
@@ -317,9 +317,11 @@ WHERE {
   }
 })
 
+
 ```
 
 ## Description
+- 2024/04/24 inheritanceの英語ラベルが取れるように変更、シノニムのソートを追加
 - 2024/03/21 タイトルを変更　旧：nanbyodata_get_metadata　及び　SPARQL修正
 - 現在NanbyouDataの表示で疾患のメタ情報を表示する部分に利用しています。
 - 過去のUIからの変遷の結果、部分的に必要の無いパートがあるので、それについての調整中(済）
