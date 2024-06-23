@@ -26,15 +26,39 @@ FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>
   ?year_data nando:has_theNumberOfPatients/sio:SIO_000300 ?num_of_patients .
 } ORDER BY ?nando ?year
 ```
-## Output
+## Outputå
 
 ```javascript
 ({result}) => {
   let tree = [];
-  // TODO nando ごとにグループ化して、年ごと(動的に取得)の統計値を出力する
-  // 最終出力を揃える: https://nanbyodata.jp/sparqlist/nanbyodata_get_stats_on_patient_number
+  result.results.bindings.forEach(d => {
+    const nando = d.nando.value
+    const index = tree.findIndex(v => v.nando === nando)
+    if (index > -1) {
+      tree[index][`num_of_${d.year.value}`] = Number(d.num_of_patients.value)
+      return
+    }
+    let newData = {
+      s: d.s.value,
+      nando,
+      label: d.label.value,
+      label_en: d.label_en.value,
+      number: Number(d.number.value),
+      num_of_2015: null,
+      num_of_2016: null,
+      num_of_2017: null,
+      num_of_2018: null,
+      num_of_2019: null,
+      num_of_2020: null,
+      num_of_2021: null,
+      num_of_2022: null
+    };
+    newData[`num_of_${d.year.value}`] = Number(d.num_of_patients.value) || null
+    tree.push(newData)
+  });
   return tree;
 };
+
 
 ```
 ## Description
