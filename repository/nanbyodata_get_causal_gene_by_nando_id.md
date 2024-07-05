@@ -118,8 +118,8 @@ order by ?nando_ida,?hgnc_gene_symbol
 
 ```
 ## Description
+- 2025/05/13 名称を変更
+- nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id
 - UIで遺伝子データを表示させるためのSPARQListです。
 - NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。
 - 編集：高月（2024/01//12)
-
-
