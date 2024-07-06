@@ -47,6 +47,8 @@ WHERE {
 }
 ```
 ## Description
+- 2025/05/13 名称変更
+- nanbyodata_get_gene_test => nanbyodata_get_genetic_test_by_nando_id
 - NANDOで遺伝子の各種検査を表示させているSPARQListです。
 - RDFのデータは高月の方で作成し、PubcaseFinderのエンドポイントにデータはあります。
 - 編集：高月(2024/01/12)

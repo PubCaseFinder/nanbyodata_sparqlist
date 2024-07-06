@@ -124,6 +124,7 @@ WHERE {
 }
 ```
 ## Description
+- nanbyodata_get_variant_by_nando_idからAPI統一の為に名前を変更したもの（2024/06/27)
 - NanbyoDataでヴァリアントの情報を表示させるために利用しているSPARQListです。
 - Togovarのエンドポイントを利用しています。
 - SPARQListの大元はTogovarから頂いています。
