@@ -26,18 +26,21 @@ FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>
   ?year_data nando:has_theNumberOfPatients/sio:SIO_000300 ?num_of_patients .
 } ORDER BY ?nando ?year
 ```
-## Outputå
+## Output
 
 ```javascript
 ({result}) => {
-  let tree = [];
+  let tree = []; // 結果リスト
   result.results.bindings.forEach(d => {
     const nando = d.nando.value
+    // 既に nando_id のデータが tree 内にあれば、年の患者数を更新
     const index = tree.findIndex(v => v.nando === nando)
     if (index > -1) {
       tree[index][`num_of_${d.year.value}`] = Number(d.num_of_patients.value)
       return
     }
+    // 以下は新しい nando_id が出てきた最初の行の処理(まだ nando_id のデータが tree にない)
+    // 各年の患者数を null にしたオブジェクトを作成
     let newData = {
       s: d.s.value,
       nando,
@@ -53,6 +56,7 @@ FROM <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>
       num_of_2021: null,
       num_of_2022: null
     };
+    // この行に含まれる年の患者数を更新
     newData[`num_of_${d.year.value}`] = Number(d.num_of_patients.value) || null
     tree.push(newData)
   });
