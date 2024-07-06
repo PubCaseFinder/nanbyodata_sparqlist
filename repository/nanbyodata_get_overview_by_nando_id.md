@@ -179,12 +179,6 @@ WHERE {
 ## Output
 
 ```javascript
-/** 引数:1200005 では返ってこないobjectのデータ(テストが終わったら消す事) 
-* descritpion: 1200001
-* shouman: 2200001
-* kegg: 2200053
-* urdbms: 1200948
-**/
 ({
   json({result, medgen, inheritance}) {
     const rows = result.results.bindings;
@@ -278,19 +272,20 @@ WHERE {
         definition: row.definition.value,
         labels: Array.from(new Set(row.labels.value.split(":")))
       }));
-
+      // labelsの返しを":"で区切って、concept_nameと被っていない値だけを抽出
       medgenData[0].labels = medgenData[0].labels.filter(label => label !== medgenData[0].concept_name);
 
+      // alt_label_enにmedgenのlabelsを加え、A-Zでsortする
       if (data.alt_label_en) {
         medgenData[0].labels.forEach(label => {
           if (!data.alt_label_en.includes(label)) {
             data.alt_label_en.push(label);
-            data.alt_label_en.sort((a, b) => a.localeCompare(b));
           }
         });
       } else {
         data.alt_label_en = medgenData[0].labels;
       }
+      data.alt_label_en.sort((a, b) => a.localeCompare(b));
 
       Object.assign(data, {
         medgen_id: medgenData[0].medgen_id,
