@@ -105,7 +105,7 @@ WHERE {
   BIND(IF(bound(?num_of_participant_2019), ?num_of_participant_2019, '-') AS ?num_of_2019)
   BIND(IF(bound(?num_of_participant_2020), ?num_of_participant_2020, '-') AS ?num_of_2020)
   BIND(IF(bound(?num_of_participant_2021), ?num_of_participant_2021, '-') AS ?num_of_2021)
-  BIND(IF(bound(?num_of_participant_2022), ?num_of_participant_2021, '-') AS ?num_of_2022) 
+  BIND(IF(bound(?num_of_participant_2022), ?num_of_participant_2022, '-') AS ?num_of_2022) 
 }
 }
 ORDER BY ?nando

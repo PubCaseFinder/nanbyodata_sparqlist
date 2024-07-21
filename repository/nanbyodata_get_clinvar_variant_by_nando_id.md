@@ -124,6 +124,7 @@ WHERE {
 }
 ```
 ## Description
+- APIの名前の変更（2024/06/27)
 - NanbyoDataでヴァリアントの情報を表示させるために利用しているSPARQListです。
 - Togovarのエンドポイントを利用しています。
 - SPARQListの大元はTogovarから頂いています。
