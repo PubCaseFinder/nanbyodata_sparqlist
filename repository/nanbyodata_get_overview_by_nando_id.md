@@ -111,7 +111,8 @@ WHERE{
   ?disease rdfs:seeAlso ?mondo_uri ;
            nando:hasInheritance ?inheritance .
   optional { ?inheritance rdfs:label ?inheritance_ja . FILTER (lang(?inheritance_ja) = "ja") }
-  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
+  #optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
+  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "") }
 }
 order by ?inheritance
 ```
@@ -383,6 +384,7 @@ WHERE {
 ```
 
 ## Description
+- 2024/08 HPOのデータの変更に伴いinheritanceの部分を申さんの方で修正を入れる
 - 2024/04/24 inheritanceの英語ラベルが取れるように変更、シノニムのソートを追加
 - 2024/03/21 タイトルを変更　旧：nanbyodata_get_metadata　及び　SPARQL修正
 - 現在NanbyouDataの表示で疾患のメタ情報を表示する部分に利用しています。

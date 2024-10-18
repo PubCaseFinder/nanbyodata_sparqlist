@@ -71,6 +71,7 @@ SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?nc
                                                oboInOwl:id ?mondo_id ;
                                                rdfs:label ?mondo_label;
                                                skos:exactMatch ?exactMatch_disease .
+                               FILTER (lang(?mondo_label) = "")  #shin add
                                  FILTER(CONTAINS(STR(?exactMatch_disease), "omim") || CONTAINS(STR(?exactMatch_disease), "Orphanet"))
                                  BIND (IRI(replace(STR(?exactMatch_disease), 'http://identifiers.org/omim/', 'http://identifiers.org/mim/')) AS ?disease) .
                                 OPTIONAL {?nando_ida skos:closeMatch ?mondo_uri;
@@ -118,7 +119,8 @@ order by ?nando_ida,?hgnc_gene_symbol
 
 ```
 ## Description
-- 2025/05/13 名称を変更
+- 2024/09/10 MONDOの日本語追加によるSPARLの修正を追加
+- 2024/05/13 名称を変更
 - nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id
 - UIで遺伝子データを表示させるためのSPARQListです。
 - NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。
