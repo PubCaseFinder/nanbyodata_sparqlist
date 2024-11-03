@@ -1,10 +1,10 @@
-# Retrieve Gene informations by the given NANDO ID
+# NANDOから糖鎖のデータを取るためのテスト
 ## Parameters
 * `nando_id` NANDO ID
-  * default: 1200003
-  * examples: 1200005
+  * default: 2200094
+  * examples: 1200403
 ## Endpoint
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
@@ -26,13 +26,6 @@ WHERE {
   }
 }
 ```
-## `nando_id_list`
-```javascript
-({nando_id}) => {
-  nando_id = "NANDO:" + nando_id.charAt(0);
-  return nando_id;
-}
-```
 ## `mondo_uri_list` get mondo uri
 ```javascript
 ({
@@ -52,7 +45,8 @@ WHERE {
 })
 ```
 ## Endpoint
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
+
 ## `gene` retrieve genes associated with the mondo uri
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -71,6 +65,7 @@ SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?nc
                                                oboInOwl:id ?mondo_id ;
                                                rdfs:label ?mondo_label;
                                                skos:exactMatch ?exactMatch_disease .
+                               FILTER (lang(?mondo_label) = "")  #shin add
                                  FILTER(CONTAINS(STR(?exactMatch_disease), "omim") || CONTAINS(STR(?exactMatch_disease), "Orphanet"))
                                  BIND (IRI(replace(STR(?exactMatch_disease), 'http://identifiers.org/omim/', 'http://identifiers.org/mim/')) AS ?disease) .
                                 OPTIONAL {?nando_ida skos:closeMatch ?mondo_uri;
@@ -90,36 +85,72 @@ SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?nc
   ?gene_id dcterms:identifier ?ncbi_id.
   ?gene_id rdfs:seeAlso ?omim_id.
 }
-order by ?nando_ida,?hgnc_gene_symbol
+
 ```
-## Output
+## `ncbigene_id_list`
 
 ```javascript
+({
+  json({ gene }) {
+    let rows = gene.results.bindings;
+    let glycogene_ids = [];
+    
+    // 重複を削除するための処理を追加
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].ncbi_id) {
+        glycogene_ids.push(rows[i].ncbi_id.value);
+      } else {
+        glycogene_ids.push("NA");
+      }
+    }
 
-({gene}) => {
-  let tree = [];
-  gene.results.bindings.forEach(d => {
-    tree.push({
-      gene_symbol: d.hgnc_gene_symbol.value,
-      omim_url: d.omim_id.value,
-      ncbi_id: d.ncbi_id.value,
-      ncbi_url: d.gene_id.value,
-      mondo_id: d.mondo_id.value,
-      mondo_label: d.mondo_label.value,
-      mondo_url: d.mondo_id.value.replace("MONDO:", "https://monarchinitiative.org/MONDO:"),
-      nando_idb: d.nando_idb.value,
-      nando_ida: d.nando_ida.value,
-      nando_label_e: d.nando_label_en.value,
-      nando_label_j: d.nando_label_ja.value
-        });
-  });
-   return tree;
-};
+    // 重複を削除するためにSetを使用
+    let unique_ids = [...new Set(glycogene_ids)];
+
+    // unique_idsを文字列に結合して返す
+    return "glycogene:" + unique_ids.join(' glycogene:');
+  }
+})
+
+
 
 ```
-## Description
-- UIで遺伝子データを表示させるためのSPARQListです。
-- NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。
-- 編集：高月（2024/01//12)
+## Endpoint
+https://ts.glycosmos.org/sparql
+## `ncbi2glyco` get glycodata geneid
+```sparql
+PREFIX glycan: <http://purl.jp/bio/12/glyco/glycan#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX glycogene: <http://glycosmos.org/glycogene/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ggdb: <http://acgg.asia/ggdb2/>
+PREFIX ggdb_owl: <http://purl.jp/bio/12/ggdb/2015/6/owl#>
 
-
+SELECT DISTINCT ?ggdbgene ?reaction_type ?acceptor_gtcid ?donor ?product_gtcid ?description
+WHERE{
+ VALUES ?glycogene_id { {{ncbigene_id_list}} }
+  ?glycogene_id rdfs:seeAlso ?ggdbgene ;
+                       dcterms:description ?description .
+  ?ggdbgene ggdb_owl:has_acceptor_substrates ?acceptorSubstrate .
+  ?acceptorSubstrate ggdb_owl:has_reaction ?reaction ;
+                     rdf:type ggdb_owl:Reference .
+  ?reaction rdf:type ?reaction_type .
+  ?reaction ggdb_owl:has_acceptor ?acceptor ;
+            ggdb_owl:has_donor ?donor ;
+            ggdb_owl:has_product ?product .
+  ?acceptor dcterms:identifier ?acceptor_jcggdbglycan .#;
+            #foaf:depiction ?jcggglycanpng .
+  ?product dcterms:identifier ?product_jcggdbglycan .
+  ?gtc_jcgg1 dcterms:identifier ?acceptor_jcggdbglycan .
+  ?acceptor_gtcid glycan:has_resource_entry ?gtc_jcgg1 .
+  ?acceptor_gtcid rdf:type glycan:Saccharide .
+  ?gtc_jcgg2 dcterms:identifier ?product_jcggdbglycan .
+  ?product_gtcid glycan:has_resource_entry ?gtc_jcgg2 .
+  ?acceptor_gtcid2 rdf:type glycan:Saccharide .
+  #FILTER CONTAINS (?reaction_type, STR(General_reaction) )
+         
+}
+LIMIT 50
+```

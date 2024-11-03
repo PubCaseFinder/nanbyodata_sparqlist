@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -56,7 +56,7 @@ WHERE {
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `medgen` retrieve information from medgen
 
@@ -103,7 +103,7 @@ LIMIT 100
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `inheritance` retrieve inheritances associated with the mondo uri
 
@@ -130,7 +130,7 @@ order by ?inheritance
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `result` retrieve a NANDO class
 

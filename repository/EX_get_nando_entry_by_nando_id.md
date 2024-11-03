@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -103,7 +103,7 @@ LIMIT 100
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `inheritance` retrieve inheritances associated with the mondo uri
 
@@ -130,7 +130,7 @@ order by ?inheritance
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `gene` retrieve genes associated with the mondo uri
 
@@ -163,7 +163,7 @@ order by ?hgnc_gene_symbol
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `phenotype` retrieve phenotypes associated with the mondo uri
 
@@ -211,7 +211,7 @@ order by ?hpo_category_name_en ?hpo_label_ja
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `genetesting` retrieve gene testing associated with the nando uri
 
@@ -328,7 +328,7 @@ WHERE{
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `result` retrieve a NANDO class
 

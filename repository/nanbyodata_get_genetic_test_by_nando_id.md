@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `result` 
 ```sparql

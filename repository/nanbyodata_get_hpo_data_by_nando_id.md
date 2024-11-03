@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -27,10 +27,16 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
-    ?nando skos:closeMatch ?mondo .
+    {
+      ?nando skos:closeMatch ?mondo .
+    }
+    UNION
+    {
+      ?nando skos:exactMatch ?mondo .
+    }
     ?mondo oboInOwl:id ?mondo_id
   }
-}
+   }
 ```
 
 ## `mondo_uri_list` get mondo uri
@@ -57,7 +63,7 @@ WHERE {
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `phenotype` retrieve phenotypes associated with the mondo uri
 

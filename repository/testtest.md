@@ -7,10 +7,11 @@
   * examples: 1200061
   
 ## Endpoint
-https://togodx.dbcls.jp/human/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo2medgen`
 ```sparql
+
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -20,20 +21,27 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT DISTINCT ?mondo ?medgen_id ?medgen_cid 
 WHERE {
-  GRAPH <http://rdf.integbio.jp/dataset/togosite/nando>{ 
+  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
+    {
       nando:{{nando_id}} skos:closeMatch ?mondo .
     }
-  GRAPH <http://rdf.integbio.jp/dataset/togosite/medgen>{ 
+    UNION
+    {
+      nando:{{nando_id}} skos:exactMatch ?mondo .
+    }
+  }
+  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/medgen> {
     ?medgen_uri
     dct:identifier ?medgen ;
     mo:mgconso ?mgconso .
     ?mgconso
     dct:source mo:MONDO ;
     rdfs:seeAlso ?mondo.
-    BIND (CONCAT("http://ncbi.nlm.nih.gov/medgen/",?medgen)AS ?medgen_id)
-    BIND (IRI(?medgen_id)AS ?medgen_cid)
-    }
+    BIND (CONCAT("http://ncbi.nlm.nih.gov/medgen/", ?medgen) AS ?medgen_id)
+    BIND (IRI(?medgen_id) AS ?medgen_cid)
+  }
 }
+
  ```
  ## `medgen`
  ```javascript

@@ -4,7 +4,7 @@
   * default: 1200003
   * examples: 1200005
 ## Endpoint
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
@@ -20,8 +20,14 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   ?nando_sub rdfs:subClassOf* ?nando.
-  OPTIONAL {
-    ?nando_sub skos:closeMatch ?mondo .
+ OPTIONAL {
+    {
+      ?nando_sub skos:closeMatch ?mondo .
+    }
+    UNION
+    {
+      ?nando_sub skos:exactMatch ?mondo .
+    }
     ?mondo oboInOwl:id ?mondo_id
   }
 }
@@ -52,7 +58,7 @@ WHERE {
 })
 ```
 ## Endpoint
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 ## `gene` retrieve genes associated with the mondo uri
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -63,23 +69,37 @@ PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+
 SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?ncbi_id ?omim_id ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
- WHERE{
-       {SELECT ?disease ?mondo_uri ?mondo_id ?mondo_label ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
-                        WHERE { VALUES ?mondo_uri { {{mondo_uri_list}} }
-                               ?mondo_sub_tier rdfs:subClassOf* ?mondo_uri ;
-                                               oboInOwl:id ?mondo_id ;
-                                               rdfs:label ?mondo_label;
-                                               skos:exactMatch ?exactMatch_disease .
-                                 FILTER(CONTAINS(STR(?exactMatch_disease), "omim") || CONTAINS(STR(?exactMatch_disease), "Orphanet"))
-                                 BIND (IRI(replace(STR(?exactMatch_disease), 'http://identifiers.org/omim/', 'http://identifiers.org/mim/')) AS ?disease) .
-                                OPTIONAL {?nando_ida skos:closeMatch ?mondo_uri;
-                                                     dcterms:identifier ?nando_idb;
-                                          rdfs:label ?nando_label_ja;
-                                          rdfs:label ?nando_label_en.
-                                 FILTER( STRSTARTS( ?nando_idb, "{{nando_id_list}}" ))
-                                 FILTER( lang(?nando_label_ja)= "ja")
-                                 FILTER( lang(?nando_label_en)= "en")}
+WHERE {
+  {
+    SELECT ?disease ?mondo_uri ?mondo_id ?mondo_label ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
+    WHERE {
+      VALUES ?mondo_uri { {{mondo_uri_list}} }
+      ?mondo_sub_tier rdfs:subClassOf* ?mondo_uri ;
+                      oboInOwl:id ?mondo_id ;
+                      rdfs:label ?mondo_label;
+                      skos:exactMatch ?exactMatch_disease .
+      FILTER (lang(?mondo_label) = "")  #shin add
+      FILTER(CONTAINS(STR(?exactMatch_disease), "omim") || CONTAINS(STR(?exactMatch_disease), "Orphanet"))
+      BIND (IRI(replace(STR(?exactMatch_disease), 'https://omim.org/entry/', 'http://identifiers.org/mim/')) AS ?disease) .
+
+      OPTIONAL {
+        {
+          ?nando_ida skos:closeMatch ?mondo_uri ;
+                     dcterms:identifier ?nando_idb.
+        }
+        UNION
+        {
+          ?nando_ida skos:exactMatch ?mondo_uri ;
+                     dcterms:identifier ?nando_idb.
+        }
+        ?nando_ida rdfs:label ?nando_label_ja ;
+                   rdfs:label ?nando_label_en.
+        FILTER(STRSTARTS(?nando_idb, "{{nando_id_list}}"))
+        FILTER(lang(?nando_label_ja) = "ja")
+        FILTER(lang(?nando_label_en) = "en")
+      }
     }
   }
   ?as sio:SIO_000628 ?disease ;
@@ -90,7 +110,8 @@ SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?nc
   ?gene_id dcterms:identifier ?ncbi_id.
   ?gene_id rdfs:seeAlso ?omim_id.
 }
-order by ?nando_ida,?hgnc_gene_symbol
+ORDER BY ?nando_ida ?hgnc_gene_symbol
+
 ```
 ## Output
 
@@ -118,7 +139,9 @@ order by ?nando_ida,?hgnc_gene_symbol
 
 ```
 ## Description
-- 2025/05/13 名称を変更
+- 2024/10/31 OMIMのURLが変更になったとの事で修正
+- 2024/09/10 MONDOの日本語追加によるSPARLの修正を追加
+- 2024/05/13 名称を変更
 - nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id
 - UIで遺伝子データを表示させるためのSPARQListです。
 - NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。

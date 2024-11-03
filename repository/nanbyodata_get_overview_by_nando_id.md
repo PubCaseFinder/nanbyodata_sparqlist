@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -27,7 +27,7 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
-    ?nando skos:closeMatch ?mondo .
+    ?nando skos:closeMatch|skos:exactMatch ?mondo .
     ?mondo oboInOwl:id ?mondo_id
   }
 }
@@ -56,7 +56,7 @@ WHERE {
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `medgen` retrieve information from medgen
 
@@ -89,7 +89,7 @@ LIMIT 100
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `inheritance` retrieve inheritances associated with the mondo uri
 
@@ -111,14 +111,15 @@ WHERE{
   ?disease rdfs:seeAlso ?mondo_uri ;
            nando:hasInheritance ?inheritance .
   optional { ?inheritance rdfs:label ?inheritance_ja . FILTER (lang(?inheritance_ja) = "ja") }
-  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
+  #optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
+  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "") }
 }
 order by ?inheritance
 ```
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `result` retrieve a NANDO class
 
@@ -170,12 +171,19 @@ WHERE {
     ?nando dcterms:description ?description  
   }
   OPTIONAL {
+  {
     ?nando skos:closeMatch ?mondo .
-    ?mondo oboInOwl:id ?mondo_id .
-    ?mondo skos:exactMatch ?db_xref .
-    ?mondo obo:IAO_0000115 ?mondo_description.
-    ?mondo oboInOwl:hasExactSynonym ?altlabel.  
   }
+  UNION
+  {
+    ?nando skos:exactMatch ?mondo .
+  }
+
+  ?mondo oboInOwl:id ?mondo_id .
+  ?mondo skos:exactMatch ?db_xref .
+  ?mondo obo:IAO_0000115 ?mondo_description .
+  ?mondo oboInOwl:hasExactSynonym ?altlabel .
+}
   OPTIONAL {
     ?nando rdfs:seeAlso ?site
   }
@@ -265,12 +273,10 @@ WHERE {
           case /kegg/.test(rows[i].site.value):
             data.kegg = {id: rows[i].site.value.split("/").slice(-1)[0].replace('www_bget?ds_ja:',''),
                             url: rows[i].site.value};
-            
             break;
           case /UR-DBMS/.test(rows[i].site.value):
             data.urdbms = {id: rows[i].site.value.split("/").slice(-1)[0].replace('SyndromeDetail.php?winid=1&recid=',''),
                             url: rows[i].site.value};
-            
             break;
         }
       }
@@ -384,8 +390,8 @@ WHERE {
 
 ```
 
-
 ## Description
+- 2024/08 HPOのinheritanceのデータが変わったことにより、申さんの方で本番環境を修正したため、本番環境よりコピー
 - 2024/04/24 inheritanceの英語ラベルが取れるように変更、シノニムのソートを追加
 - 2024/03/21 タイトルを変更　旧：nanbyodata_get_metadata　及び　SPARQL修正
 - 現在NanbyouDataの表示で疾患のメタ情報を表示する部分に利用しています。

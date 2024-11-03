@@ -1,11 +1,11 @@
 ## Parameters
 * `nando_id` NANDO ID
-  * default: nando:1200003
+  * default: 1200003
  
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `result` 
 ```sparql
@@ -24,8 +24,8 @@ SELECT DISTINCT ?nando ?label ?label_en ?year ?num_of_patients
 
 
 WHERE {
-  GRAPH<https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
-      {{nando_id}} sio:SIO_000216 ?B1 .
+  GRAPH<https://pubcasefinder.dbcls.jp/rdf/nanbyodata> {
+     nando:{{nando_id}} sio:SIO_000216 ?B1 .
     ?B1 nando:has_aYearOfStatistics ?B2.
     ?B2 sio:SIO_000300 ?year.
     ?B1 nando:has_theNumberOfPatients ?B3.
@@ -43,6 +43,7 @@ WHERE {
     tree.push({
       year: d.year.value,
       num_of_patients: Number(d.num_of_patients.value),
+      group: "patient",
     });
   });
   return tree;

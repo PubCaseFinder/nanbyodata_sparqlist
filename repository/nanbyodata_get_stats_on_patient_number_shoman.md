@@ -76,10 +76,6 @@ graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
 
 ```
 ## Description
-- 2024/03/21 タイトルを変更しました。旧："nanbyoData_the_number_of_patients_list"
-- 2024/03/13 タイトルを修正して新規に作成、患者数のデータを2021年、2022年を追加しました。
-- NanbyoDataで希少難病疾患の患者数を表示させるために利用しているSPARQListです。
-- RDFのデータは高月の方で作成し、PubcaseFinderのエンドポイントにデータはあります。
-- 編集：高月（2024/01/12)
+- 2024/10/21　新規追加　小児慢性の患者数の表示用
 
 
