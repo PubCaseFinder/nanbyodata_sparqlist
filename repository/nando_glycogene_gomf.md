@@ -1,4 +1,4 @@
-# テスト：NANDOから糖鎖のデータを取るためのテスト+GlyCosmos gene data　＆　GO Molecular functionの表示
+# NANDOから糖鎖のデータを取得+GlyCosmos gene data　＆　GO Molecular functionの表示
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200093
@@ -140,9 +140,7 @@ PREFIX sio:<http://semanticscience.org/resource/>
 PREFIX up: <http://purl.uniprot.org/core/>
 PREFIX go: <http://www.geneontology.org/formats/oboInOwl#>
 
-#SELECT DISTINCT ?ncbigene_id ?gene_idStr ?description ?go ?go_term #?evi_code ?evi_url
-#(GROUP_CONCAT(DISTINCT ?evidence ; separator = "|") AS ?evidences)
-#(GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
+
 SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf #?go_id ?evi_url ?evi_code
 (GROUP_CONCAT(DISTINCT ?evidence ; separator = "|") AS ?evidences) 
 (GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
@@ -194,20 +192,18 @@ WHERE{
 
       // エビデンスが存在するかをチェック
       if (row.evidences?.value) {
-        //check = row.evidences.value;
+        check = row.evidences.value;
         evi_array = row.evidences.value.split('|');
       }
       
-      // 不要な要素を削除
+      // 不要な要素を削除（１つめの:を削除）
       if (evi_array[0] === ":") {
         evi_array.splice(0, 1);
       }
-      //evi_array.splice(evi_array.indexOf(":"), 1);
       
       // エビデンス配列を処理
       evi_array.forEach((value) => {
-        let label = value.substr(0, value.indexOf(':'));
-        
+        let label = value.substr(0, value.indexOf(':'));       
         if (label === label.toUpperCase()) {
           let id = value.substr(value.indexOf(':') + 1);
           let id_url = "https://evidenceontology.org/term/" + id;
@@ -240,16 +236,7 @@ WHERE{
         "go_term_mf": row.go_term_mf?.value || "",
         "go": row.go?.value || "",
         "evidence_code": evi_arrays,
-        "pmid": pmid_arrays,
-        //"check_evidence_code": check
-        //"pmid": row.pmid_ids ? row.pmid_ids.value.split(",") : [],//PMID出力pattern２
-        //"pmid_link": row.pmids ? row.pmids.value.split(",") : []
-        //"pmid": row.pmid_ids //PMID出力pattern3
-        //  ? row.pmid_ids.value.split(",").map((pmid) => ({
-        //      id: pmid.trim(),
-        //      uri: pmid.trim()? `http://identifiers.org/pubmed/${pmid.trim()}` :""
-        //    }))
-        //  : []
+        "pmid": pmid_arrays
       };
     });
   }
