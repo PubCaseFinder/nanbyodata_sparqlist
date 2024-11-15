@@ -17,7 +17,7 @@ fi
 
 # .envファイルを読み込む
 if [ -f .env ]; then
-    source .env
+    export $(grep -v '^#' .env | xargs)
 else
     echo "[ERROR] .env ファイルが見つかりません。 .env ファイルがあるディレクトリでスクリプトを実行して下さい"
     exit 1
@@ -30,8 +30,8 @@ if [ -z "${DEV_REPOSITORY_DIR+x}" ]; then
 fi
 
 # このスクリプトからの相対パスで本番用の repository ディレクトリを取得
-script_dir=$(readlink -f "$(dirname "$0")")
-PRODUCT_REPOSITORY_DIR=$script_dir/../repository
+SCRIPT_DIR=$(readlink -f "$(dirname "$0")")
+PRODUCT_REPOSITORY_DIR=${SCRIPT_DIR}/../repository
 
 # 開発用と本番用で切り替える sparql エンドポイントのURL
 DEV_ENDPOINT_URL="https://dev-nanbyodata.dbcls.jp/sparql"

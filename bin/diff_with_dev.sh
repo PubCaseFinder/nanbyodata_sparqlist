@@ -9,7 +9,7 @@ set -u
 
 # .envファイルを読み込む
 if [ -f .env ]; then
-    source .env
+    export $(grep -v '^#' .env | xargs)
 else
     echo "[ERROR] .env ファイルが見つかりません。 .env ファイルがあるディレクトリでスクリプトを実行して下さい"
     exit 1
@@ -22,15 +22,15 @@ if [ -z "${DEV_REPOSITORY_DIR+x}" ]; then
 fi
 
 # このスクリプトからの相対パスで本番用の repository ディレクトリを取得
-script_dir=$(readlink -f "$(dirname "$0")")
-PRODUCT_REPOSITORY_DIR=$script_dir/../repository
+SCRIPT_DIR=$(readlink -f "$(dirname "$0")")
+PRODUCT_REPOSITORY_DIR=${SCRIPT_DIR}/../repository
 
 # 開発用 respository からのコピーファイルを保存する一時ディレクトリ
-DEV_COPY_REPOSITORY_DIR=$script_dir/../tmp/repository/
+DEV_COPY_REPOSITORY_DIR=${SCRIPT_DIR}/../tmp/repository/
 
 # 開発用 respository をコピーする
 rm ${DEV_COPY_REPOSITORY_DIR}/*
-scp -r ${DEV_REPOSITORY_DIR} ${script_dir}/../tmp/
+scp -r ${DEV_REPOSITORY_DIR} ${SCRIPT_DIR}/../tmp/
 
 echo "====="
 echo "開発環境と本番環境の repository/*.md を比較します"
