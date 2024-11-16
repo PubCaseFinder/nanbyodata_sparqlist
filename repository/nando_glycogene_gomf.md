@@ -188,11 +188,9 @@ WHERE{
       let evi_arrays = [];
       let pmid_array = [];
       let pmid_arrays = [];
-      let check =[]
 
       // エビデンスが存在するかをチェック
       if (row.evidences?.value) {
-        check = row.evidences.value;
         evi_array = row.evidences.value.split('|');
       }
       

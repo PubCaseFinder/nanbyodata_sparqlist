@@ -190,7 +190,7 @@ WHERE{
       let evi_arrays = [];
       let pmid_array = [];
       let pmid_arrays = [];
-      let check =[]
+      //let check =[]
 
       // エビデンスが存在するかをチェック
       if (row.evidences?.value) {
