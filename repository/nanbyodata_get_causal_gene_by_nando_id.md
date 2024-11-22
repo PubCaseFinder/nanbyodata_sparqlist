@@ -20,8 +20,14 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   ?nando_sub rdfs:subClassOf* ?nando.
-  OPTIONAL {
-    ?nando_sub skos:closeMatch ?mondo .
+ OPTIONAL {
+    {
+      ?nando_sub skos:closeMatch ?mondo .
+    }
+    UNION
+    {
+      ?nando_sub skos:exactMatch ?mondo .
+    }
     ?mondo oboInOwl:id ?mondo_id
   }
 }
@@ -97,11 +103,18 @@ order by ?nando_ida,?hgnc_gene_symbol
 
 ```javascript
 
-({gene}) => {
+({ gene }) => {
   let tree = [];
+  let uniqueCheck = new Set();
+
   gene.results.bindings.forEach(d => {
+    const geneSymbol = d.hgnc_gene_symbol.value;
+
+    // 既に登録済みの場合はスキップ
+    if (uniqueCheck.has(geneSymbol)) return;
+
     tree.push({
-      gene_symbol: d.hgnc_gene_symbol.value,
+      gene_symbol: geneSymbol,
       omim_url: d.omim_id.value,
       ncbi_id: d.ncbi_id.value,
       ncbi_url: d.gene_id.value,
@@ -112,13 +125,19 @@ order by ?nando_ida,?hgnc_gene_symbol
       nando_ida: d.nando_ida.value,
       nando_label_e: d.nando_label_en.value,
       nando_label_j: d.nando_label_ja.value
-        });
+    });
+
+    // 登録済みとする
+    uniqueCheck.add(geneSymbol);
   });
-   return tree;
+
+  return tree;
 };
+
 
 ```
 ## Description
+- 2024/11/22 NANDO改変に伴う変更
 - 2024/09/10 MONDOの日本語追加によるSPARLの修正を追加
 - 2024/05/13 名称を変更
 - nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id

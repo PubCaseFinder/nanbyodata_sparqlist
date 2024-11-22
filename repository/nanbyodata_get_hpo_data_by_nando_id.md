@@ -27,10 +27,16 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
-    ?nando skos:closeMatch ?mondo .
+    {
+      ?nando skos:closeMatch ?mondo .
+    }
+    UNION
+    {
+      ?nando skos:exactMatch ?mondo .
+    }
     ?mondo oboInOwl:id ?mondo_id
   }
-}
+   }
 ```
 
 ## `mondo_uri_list` get mondo uri
@@ -116,6 +122,7 @@ order by ?hpo_category_name_en ?hpo_label_ja
 
 ```
 ## Description
+- 2024/11/22 NANDO改変に伴う変更
 - NanbyoDataで症状を表示させるためのSPARQListです。
 - NANDOからMONDOへ変更し、MONDOからHPOのIDを取得しています。
 - 編集：高月（2024/01/12)

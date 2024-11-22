@@ -1,5 +1,5 @@
-#Number of children with chronic diseases
-- 小児慢性の患者数を
+# Get stats on patient number shoman
+- 小児慢性の受給者数の一覧を表示する
 
 ## Endpoint
 
@@ -77,4 +77,4 @@ graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
 
 ```
 ## Description
-- 2024年10月21日新規追加
+- 2024/10/21　新規追加　小児慢性の患者数の表示用

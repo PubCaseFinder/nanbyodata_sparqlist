@@ -27,8 +27,15 @@ PREFIX m2r: <http://med2rdf.org/ontology/med2rdf#>
 SELECT DISTINCT ?dbxref ?omimps ?mondo ?mondolabel ?significance ?type ?variantID ?hgvs ?vtype ?position ?ch ?mgendogeneID ?genelabel ?geneXref
  WHERE{
   GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{ 
-       nando:{{nando_id}} skos:closeMatch ?mondo .
+       OPTIONAL {
+    {
+      nando:{{nando_id}}  skos:closeMatch ?mondo .
     }
+    UNION
+    {
+      nando:{{nando_id}}  skos:exactMatch ?mondo .
+    }
+     }
   GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/mondo>{ 
     ?mondo rdfs:label ?mondolabel; 
     oboInOwl:hasDbXref ?dbxref.
@@ -49,7 +56,7 @@ SELECT DISTINCT ?dbxref ?omimps ?mondo ?mondolabel ?significance ?type ?variantI
     ?variantID m2r:gene ?mgendogeneID.
     ?mgendogeneID rdfs:label ?genelabel;
                   rdfs:seeAlso ?geneXref.              
-    }}
+    }}}
 ```
 ## Output
 
@@ -85,5 +92,4 @@ SELECT DISTINCT ?dbxref ?omimps ?mondo ?mondolabel ?significance ?type ?variantI
 
 ```
 ## Description
-- MGenDのデータを取るためのSPARQList 作成　2024/06/27
-- MGenDのエンドポイントは開発環境のままなので、エンドポイントの差し替えは後日実施
+- MGenDのデータを取るためのSPARQList

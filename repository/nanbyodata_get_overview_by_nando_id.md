@@ -27,7 +27,7 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
-    ?nando skos:closeMatch ?mondo .
+    ?nando skos:closeMatch|skos:exactMatch ?mondo .
     ?mondo oboInOwl:id ?mondo_id
   }
 }
@@ -384,7 +384,8 @@ WHERE {
 ```
 
 ## Description
-- 2024/08 HPOのデータの変更に伴いinheritanceの部分を申さんの方で修正を入れる
+- 2024/11/22 NANDO改変に伴い修正
+- 2024/08 HPOのinheritanceのデータが変わったことにより、申さんの方で本番環境を修正したため、本番環境よりコピー
 - 2024/04/24 inheritanceの英語ラベルが取れるように変更、シノニムのソートを追加
 - 2024/03/21 タイトルを変更　旧：nanbyodata_get_metadata　及び　SPARQL修正
 - 現在NanbyouDataの表示で疾患のメタ情報を表示する部分に利用しています。

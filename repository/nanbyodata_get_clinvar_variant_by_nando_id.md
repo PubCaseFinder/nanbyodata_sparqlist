@@ -7,7 +7,7 @@
   * examples: 1200061
   
 ## Endpoint
-https://togodx.dbcls.jp/human/sparql
+https://pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo2medgen`
 ```sparql
@@ -20,10 +20,16 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT DISTINCT ?mondo ?medgen_id ?medgen_cid 
 WHERE {
-  GRAPH <http://rdf.integbio.jp/dataset/togosite/nando>{ 
-      nando:{{nando_id}} skos:closeMatch ?mondo .
+  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{ 
+       {
+       nando:{{nando_id}} skos:closeMatch ?mondo .
     }
-  GRAPH <http://rdf.integbio.jp/dataset/togosite/medgen>{ 
+    UNION
+    {
+       nando:{{nando_id}} skos:exactMatch ?mondo .
+    }
+    }
+  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/medgen>{ 
     ?medgen_uri
     dct:identifier ?medgen ;
     mo:mgconso ?mgconso .
@@ -83,13 +89,13 @@ WHERE {
     # FILTER(?dbname IN ("dbSNP"))
   }
 
-   GRAPH <http://togovar.org/variant/annotation/clinvar> {
+  GRAPH <http://togovar.org/variant/annotation/clinvar> {
     ?variant dct:identifier ?variation_id .
    }
 
   GRAPH <http://togovar.org/variant> {
-    ?variant dct:identifier ?tgv_id ;
-             rdf:type ?type.
+   OPTIONAL{ ?variant dct:identifier ?tgv_id ;
+             rdf:type ?type.}
   }
 }
                     
@@ -99,32 +105,42 @@ WHERE {
 ({medgen2clinvar2togovar, nando2mondo2medgen}) => {
     const medgen2mondo = {};
     nando2mondo2medgen.results.bindings.forEach(x => {
-      medgen2mondo[x.medgen_id.value] = x.mondo.value;
-                });
-    return medgen2clinvar2togovar.results.bindings.map(x => {
-    const position = x.variant.value.match(/http:\/\/identifiers.org\/hco\/(.+)\/GRCh3[78]#(\d+)/);
+        medgen2mondo[x.medgen_id.value] = x.mondo.value;
+    });
 
-    return {
-      tgv_id: x.tgv_id.value,
-      tgv_link: "https://grch38.togovar.org/variant/" + x.tgv_id.value,
-      position: position[1] + ":" + position[2],
-      title: x.title.value,
-      Clinvar_link: x.clinvar.value,
-      Clinvar_id: x. vcv.value,
-      Interpretation: x. interpretation. value,
-      type: x.type.value.replace("http://genome-variation.org/resource#",""),
-      MedGen_id: x.med_id.value.replace("http://ncbi.nlm.nih.gov/medgen/",""),
-      MedGen_link:x.med_id.value,
-      mondo: medgen2mondo[x.med_id.value],
-      mondo_id: medgen2mondo[x.med_id.value].replace("http://purl.obolibrary.org/obo/MONDO_","MONDO:")
-      
-      
-    };
-  });
-}
+    return medgen2clinvar2togovar.results.bindings.map(x => {
+        const positionMatch = x.variant && x.variant.value 
+            ? x.variant.value.match(/http:\/\/identifiers.org\/hco\/(.+)\/GRCh3[78]#(\d+)/) 
+            : null;
+        const position = positionMatch ? positionMatch[1] + ":" + positionMatch[2] : "";
+
+        // tgv_id と tgv_link の存在確認
+        const tgv_id = x.tgv_id && x.tgv_id.value ? x.tgv_id.value : "";
+        const tgv_link = tgv_id ? "https://grch38.togovar.org/variant/" + tgv_id : "";
+
+        return {
+            tgv_id: tgv_id,
+            tgv_link: tgv_link,
+            position: position,
+            title: x.title && x.title.value ? x.title.value : "",
+            Clinvar_link: x.clinvar && x.clinvar.value ? x.clinvar.value : "",
+            Clinvar_id: x.vcv && x.vcv.value ? x.vcv.value : "",
+            Interpretation: x.interpretation && x.interpretation.value ? x.interpretation.value : "",
+            type: x.type && x.type.value ? x.type.value.replace("http://genome-variation.org/resource#", "") : "",
+            MedGen_id: x.med_id && x.med_id.value ? x.med_id.value.replace("http://ncbi.nlm.nih.gov/medgen/", "") : "",
+            MedGen_link: x.med_id && x.med_id.value ? x.med_id.value : "",
+            mondo: x.med_id && medgen2mondo[x.med_id.value] ? medgen2mondo[x.med_id.value] : "",
+            mondo_id: x.med_id && medgen2mondo[x.med_id.value] 
+                ? medgen2mondo[x.med_id.value].replace("http://purl.obolibrary.org/obo/MONDO_", "MONDO:") 
+                : ""
+        };
+    });
+}      
+
 ```
 ## Description
-- nanbyodata_get_variant_by_nando_idからAPI統一の為に名前を変更したもの（2024/06/27)
+- NANDO改変に伴う変更　2024/11/22
+- APIの名前の変更（2024/06/27)
 - NanbyoDataでヴァリアントの情報を表示させるために利用しているSPARQListです。
 - Togovarのエンドポイントを利用しています。
 - SPARQListの大元はTogovarから頂いています。
