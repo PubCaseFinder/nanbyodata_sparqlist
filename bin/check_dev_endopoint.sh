@@ -37,7 +37,7 @@ rm "$tempfile"
 # メッセージ出力
 output=$(printf "%s, " "${file_list[@]}")
 if [[ ${#file_list[@]} -gt 0 ]]; then
-    message="開発環境用Endpointが書かれている可能性があります."
+    message="本番環境の SPARQList に開発環境用 Endpoint が書かれている可能性があります."
     echo $message
     echo $output
     if [ -z "${WEBHOOK_URL+x}" ]; then
@@ -47,7 +47,7 @@ if [[ ${#file_list[@]} -gt 0 ]]; then
           \"text\": \"$message $output\"
         }"
         echo $payload
-        #curl -X POST -H 'Content-type: application/json' --data "$payload" "$WEBHOOK_URL"
+        curl -X POST -H 'Content-type: application/json' --data "$payload" "$WEBHOOK_URL"
     fi
 else
     echo "開発環境用Endpointは見つかりませんでした."
