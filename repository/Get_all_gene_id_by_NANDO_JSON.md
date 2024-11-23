@@ -1,12 +1,7 @@
-# Retrieve Gene informations by the given NANDO ID
-## Parameters
-* `nando_id` NANDO ID
-  * default: 1200003
-  * examples: 1200005
-  
+# HPにアップロードする遺伝子ファイルを作成する（JSON)
+
 ## Endpoint
 https://dev-pubcasefinder.dbcls.jp/sparql/
-
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
@@ -17,29 +12,22 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
-SELECT *
+SELECT ?nando ?mondo ?mondo_id
 WHERE {
-  ?nando a owl:Class ;
-         dcterms:identifier "NANDO:{{nando_id}}" .
-  ?nando_sub rdfs:subClassOf* ?nando.
- OPTIONAL {
+  graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{
+   OPTIONAL {
     {
-      ?nando_sub skos:closeMatch ?mondo .
+      ?nando skos:closeMatch ?mondo .
     }
     UNION
     {
-      ?nando_sub skos:exactMatch ?mondo .
-    }
-    ?mondo oboInOwl:id ?mondo_id
-  }
+      ?nando skos:exactMatch ?mondo .   
+}}}
+   
+       ?mondo oboInOwl:id ?mondo_id .
+  
 }
-```
-## `nando_id_list`
-```javascript
-({nando_id}) => {
-  nando_id = "NANDO:" + nando_id.charAt(0);
-  return nando_id;
-}
+
 ```
 ## `mondo_uri_list` get mondo uri
 ```javascript
@@ -61,6 +49,7 @@ WHERE {
 ```
 ## Endpoint
 https://dev-pubcasefinder.dbcls.jp/sparql/
+
 ## `gene` retrieve genes associated with the mondo uri
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -72,7 +61,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?ncbi_id ?omim_id ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
+SELECT DISTINCT ?hgnc_gene_symbol  ?nando_idb
 WHERE {
   {
     SELECT ?disease ?mondo_uri ?mondo_id ?mondo_label ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
@@ -98,7 +87,7 @@ WHERE {
         }
         ?nando_ida rdfs:label ?nando_label_ja ;
                    rdfs:label ?nando_label_en.
-        FILTER(STRSTARTS(?nando_idb, "{{nando_id_list}}"))
+        FILTER(STRSTARTS(?nando_idb, "NANDO:1"))
         FILTER(lang(?nando_label_ja) = "ja")
         FILTER(lang(?nando_label_en) = "en")
       }
@@ -112,7 +101,6 @@ WHERE {
   ?gene_id dcterms:identifier ?ncbi_id.
   ?gene_id rdfs:seeAlso ?omim_id.
 }
-ORDER BY ?nando_ida ?hgnc_gene_symbol
 
 ```
 ## Output
@@ -121,45 +109,20 @@ ORDER BY ?nando_ida ?hgnc_gene_symbol
 
 ({ gene }) => {
   let tree = [];
-  let uniqueCheck = new Set();
-
   gene.results.bindings.forEach(d => {
-    const geneSymbol = d.hgnc_gene_symbol.value;
-
-    // 既に登録済みの場合はスキップ
-    if (uniqueCheck.has(geneSymbol)) return;
+    // 安全に値をチェック
+    const geneSymbol = d.hgnc_gene_symbol?.value || null;
+    const nandoIdb = d.nando_idb?.value || null;
 
     tree.push({
       gene_symbol: geneSymbol,
-      omim_url: d.omim_id.value,
-      ncbi_id: d.ncbi_id.value,
-      ncbi_url: d.gene_id.value,
-      mondo_id: d.mondo_id.value,
-      mondo_label: d.mondo_label.value,
-      mondo_url: d.mondo_id.value.replace("MONDO:", "https://monarchinitiative.org/MONDO:"),
-      nando_idb: d.nando_idb.value,
-      nando_ida: d.nando_ida.value,
-      nando_label_e: d.nando_label_en.value,
-      nando_label_j: d.nando_label_ja.value
+      nando_idb: nandoIdb
     });
-
-    // 登録済みとする
-    uniqueCheck.add(geneSymbol);
   });
-
   return tree;
 };
 
 
 ```
-## Description
-- 2024/11/22 NANDO改変に伴う変更
-- 2024/10/31 OMIMのURLが変更になったとの事で修正
-- 2024/09/10 MONDOの日本語追加によるSPARLの修正を追加
-- 2024/05/13 名称を変更
-- nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id
-- UIで遺伝子データを表示させるためのSPARQListです。
-- NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。
-- 編集：高月（2024/01//12)
 
 

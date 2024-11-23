@@ -1,3 +1,4 @@
+# Get patient number by NANDO ID
 ## Parameters
 * `nando_id` NANDO ID
   * default: 1200003
@@ -49,6 +50,7 @@ WHERE {
   return tree;
 };
 ```
-
+## Description
+- NanbyoDataで患者数疾患単位で表示させるためのSPARQListです。2024/11/19 高月
 
  

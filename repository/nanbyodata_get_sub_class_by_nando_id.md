@@ -1,4 +1,4 @@
-# NANDOの下位概念を検索する
+# Get sub-class by NANDO ID
 ## Parameters
 * `nando_id` NANDO ID
   * default: 1200725
@@ -54,6 +54,7 @@ ORDER BY ?nando_id
   let uniqueIds = new Set();
   let addedSubIds = new Set();
   let nandoSubSet = new Set();
+  let nandoIdSet = new Set(); // ?nando の ID を追跡
 
   // result.results.bindings の存在を確認
   if (result && result.results && result.results.bindings) {
@@ -71,6 +72,9 @@ ORDER BY ?nando_id
       const nandoId = d.id.value.replace("http://nanbyodata.jp/ontology/NANDO_", "NANDO:");
       const parentId = d.parent.value.replace("http://nanbyodata.jp/ontology/NANDO_", "NANDO:");
       const nandoSubId = d.nando_sub.value.replace("http://nanbyodata.jp/ontology/NANDO_", "NANDO:");
+
+      // ?nando をセットに追加
+      nandoIdSet.add(nandoId);
 
       // ?nando と ?nando_sub が同じ場合
       if (d.nando.value === d.nando_sub.value) {
@@ -119,33 +123,43 @@ ORDER BY ?nando_id
         addedSubIds.add(nandoSubId);
       }
     });
-  }
 
-  // 3. parent の値が nando_sub にない場合は除外
-  tree = tree.filter(node => !node.parent || nandoSubSet.has(node.parent));
+    // 3. 重複する ?nando の id がある場合、parent がないものを優先して残す
+    let finalTree = [];
+    let nandoIdCount = {};
 
-  // 4. 重複する ?nando の id がある場合、parent がないものを優先して残す
-  let finalTree = [];
-  let nandoIdCount = {};
+    // 各 id の出現回数を確認
+    tree.forEach(node => {
+      nandoIdCount[node.id] = (nandoIdCount[node.id] || 0) + 1;
+    });
 
-  // 各 id の出現回数を確認
-  tree.forEach(node => {
-    nandoIdCount[node.id] = (nandoIdCount[node.id] || 0) + 1;
-  });
-
-  // 重複する場合、parent がないものを優先
-  tree.forEach(node => {
-    if (nandoIdCount[node.id] > 1) {
-      if (node.parent === undefined) {  // parent フィールドがないものを優先
+    // 重複する場合、parent がないものを優先
+    tree.forEach(node => {
+      if (nandoIdCount[node.id] > 1) {
+        if (node.parent === undefined) { // parent フィールドがないものを優先
+          finalTree.push(node);
+        }
+      } else {
         finalTree.push(node);
       }
-    } else {
-      finalTree.push(node);
-    }
-  });
+    });
 
-  return finalTree;
-}
+    // 4. 最後に parent の値が他のレコードの id にない場合を削除（?nando と ?nando_sub が同じ場合を除く）
+    const ids = new Set(finalTree.map(node => node.id)); // 現在のすべての id をセットにする
+    finalTree = finalTree.filter(node => {
+      if (node.parent === undefined || node.id === node.parent) {
+        // parent がない場合、または ?nando と ?nando_sub が同じ場合は残す
+        return true;
+      }
+      // parent が id に存在する場合のみ残す
+      return ids.has(node.parent);
+    });
 
+    console.log("最終ツリー:", finalTree);
+    return finalTree;
+  }
+};
 
 ```
+## Description
+- NanbyoDataで下位疾患を表示させるためのSPARQListです。2024/11/19 高月

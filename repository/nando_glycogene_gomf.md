@@ -188,7 +188,11 @@ WHERE{
       let evi_arrays = [];
       let pmid_array = [];
       let pmid_arrays = [];
-
+      
+      //glycosmos geneのリンク
+      let glycogene = row.gene_idStr.value;
+      let glycogene_url = "https://glycosmos.org/genes/" + glycogene;
+      
       // エビデンスが存在するかをチェック
       if (row.evidences?.value) {
         evi_array = row.evidences.value.split('|');
@@ -228,7 +232,7 @@ WHERE{
 
       // 各プロパティの存在をチェックし、デフォルト値を設定
       return {
-        "glycosmosgene": row.glycogene_id?.value || "",
+        "glycosmosgene": glycogene_url,
         "gene_id": row.gene_idStr?.value || "",
         "ncbigene_description": row.description?.value || "",
         "go_term_mf": row.go_term_mf?.value || "",

@@ -1,11 +1,5 @@
 # Get phenotype data
 
-## Parameters
-
-* `nando_id` NANDO ID
-  * default: 1200005
-  * examples: 1200009, 2200865
-
 ## Endpoint
 
 https://dev-pubcasefinder.dbcls.jp/sparql/
@@ -22,10 +16,10 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT *
+SELECT ?nand ?nandoid ?mondo ?mondo_id
 WHERE {
   ?nando a owl:Class ;
-         dcterms:identifier "NANDO:{{nando_id}}" .
+         dcterms:identifier ?nandoid .
   OPTIONAL {
     {
       ?nando skos:closeMatch ?mondo .
@@ -76,9 +70,6 @@ PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 SELECT DISTINCT
-?hpo_category
-?hpo_category_name_en
-?hpo_category_name_ja
 ?hpo_id
 ?hpo_url
 ?hpo_label_en
@@ -96,33 +87,70 @@ WHERE {
     
   GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/hp>{
     optional { ?hpo_category rdfs:subClassOf obo:HP_0000118 . }
-    ?hpo_category rdfs:label ?hpo_category_name_en .
-    ?hpo_url rdfs:subClassOf+ ?hpo_category .
     ?hpo_url rdfs:label ?hpo_label_en .
     ?hpo_url <http://www.geneontology.org/formats/oboInOwl#id> ?hpo_id .
     ?hpo_url obo:IAO_0000115 ?definition .
   }
     
-  optional { ?hpo_category rdfs:label ?hpo_category_name_ja . FILTER (lang(?hpo_category_name_ja) = "ja") }
-  optional { ?hpo_url rdfs:label ?hpo_label_ja . FILTER (lang(?hpo_label_ja) = "ja") }    
+ optional { ?hpo_url rdfs:label ?hpo_label_ja . FILTER (lang(?hpo_label_ja) = "ja") }    
 }
-order by ?hpo_category_name_en ?hpo_label_ja
+
 ```
 ## Output
 
 ```javascript
-({phenotype})=>{ 
-  return phenotype.results.bindings.map(data => {
-    return Object.keys(data).reduce((obj, key) => {
-      obj[key] = data[key].value;
-      return obj;
-    }, {});
+function processResults(nando2mondo, phenotype) {
+  // 入力データの検証
+  if (!Array.isArray(nando2mondo) || !Array.isArray(phenotype)) {
+    throw new Error("Invalid input: `nando2mondo` and `phenotype` must be arrays.");
+  }
+
+  const nandoToMondoMap = {};
+
+  // `nando2mondo` から nando_id と mondo_id を対応付け
+  nando2mondo.forEach(row => {
+    if (row && row.nandoid && row.nandoid.value) {
+      const nando_id = row.nandoid.value;
+      const mondo_id = row.mondo_id ? row.mondo_id.value.replace("MONDO:", "MONDO_") : null;
+
+      if (!nandoToMondoMap[nando_id]) {
+        nandoToMondoMap[nando_id] = {
+          nando_id,
+          mondo_id,
+          hpo_ids: []
+        };
+      }
+    }
   });
+
+  // `phenotype` から hpo_id を対応付け
+  phenotype.forEach(row => {
+    if (row && row.mondo_uri && row.mondo_uri.value && row.hpo_id && row.hpo_id.value) {
+      const mondo_uri = row.mondo_uri.value.replace("obo:", "MONDO_");
+      const hpo_id = row.hpo_id.value;
+
+      Object.values(nandoToMondoMap || {}).forEach(entry => {
+        if (entry.mondo_id === mondo_uri) {
+          entry.hpo_ids.push(hpo_id);
+        }
+      });
+    }
+  });
+
+  // 結果を JSON 形式に整形
+  const result = Object.values(nandoToMondoMap || {}).map(entry => ({
+    nando_id: entry.nando_id,
+    hpo_ids: entry.hpo_ids.length > 0 ? entry.hpo_ids : ["NA"]
+  }));
+
+  return result;
 }
+
+
+
 
 ```
 ## Description
-- 2024/11/22 NANDO改変に伴う変更
 - NanbyoDataで症状を表示させるためのSPARQListです。
 - NANDOからMONDOへ変更し、MONDOからHPOのIDを取得しています。
 - 編集：高月（2024/01/12)

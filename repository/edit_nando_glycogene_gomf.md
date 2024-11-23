@@ -1,8 +1,8 @@
-# NANDOから糖鎖のデータを取るためのテスト
+# 修正中：MetaStanza用にNANDOから糖鎖のデータを取得+GlyCosmos gene data　＆　GO Molecular functionの表示
 ## Parameters
 * `nando_id` NANDO ID
-  * default: 2200094
-  * examples: 1200403
+  * default: 2200093
+  * examples: 1200147
 ## Endpoint
 https://dev-pubcasefinder.dbcls.jp/sparql/
 ## `nando2mondo` get mondo_id correspoinding to nando_id
@@ -20,8 +20,14 @@ WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   ?nando_sub rdfs:subClassOf* ?nando.
-  OPTIONAL {
-    ?nando_sub skos:closeMatch ?mondo .
+   OPTIONAL {
+    {
+      ?nando skos:closeMatch ?mondo .
+    }
+    UNION
+    {
+      ?nando skos:exactMatch ?mondo .
+    }
     ?mondo oboInOwl:id ?mondo_id
   }
 }
@@ -108,7 +114,9 @@ SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?nc
     let unique_ids = [...new Set(glycogene_ids)];
 
     // unique_idsを文字列に結合して返す
-    return "glycogene:" + unique_ids.join(' glycogene:');
+    //return "glycogene:" + unique_ids.join(' glycogene:');//コメントアウト
+    //return "http://glycosmos.org/glycogene/" + unique_ids.join(', http://glycosmos.org/glycogene/');
+    return unique_ids;//うまくいく方
   }
 })
 
@@ -127,30 +135,116 @@ PREFIX glycogene: <http://glycosmos.org/glycogene/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX ggdb: <http://acgg.asia/ggdb2/>
 PREFIX ggdb_owl: <http://purl.jp/bio/12/ggdb/2015/6/owl#>
+PREFIX taxonomy: <http://identifiers.org/taxonomy/>
+PREFIX sio:<http://semanticscience.org/resource/>
+PREFIX up: <http://purl.uniprot.org/core/>
+PREFIX go: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT DISTINCT ?ggdbgene ?reaction_type ?acceptor_gtcid ?donor ?product_gtcid ?description
+
+SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf ?evi_url ?evidence ?pmid_id ?pmid#?go_id ?evi_url ?evi_code
+#(GROUP_CONCAT(DISTINCT ?evidence ; separator = "|") AS ?evidences) 
+#(GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
+#(GROUP_CONCAT(DISTINCT IRI(?pmid_uri) ; SEPARATOR = ",") AS ?pmid_uris)
+FROM<http://rdf.glycosmos.org/glycogenes> #FROM1
+FROM <http://purl.obolibrary.org/obo/go.owl> #FROM2
+FROM <http://purl.obolibrary.org/obo/eco.owl> #FROM3
+
 WHERE{
- VALUES ?glycogene_id { {{ncbigene_id_list}} }
+  #VALUES ?glycogene_id { {{ncbigene_id_list}} }
+  VALUES ?glycogene_id { {{#each ncbigene_id_list}} <http://glycosmos.org/glycogene/{{this}}> {{/each}} }
+
   ?glycogene_id rdfs:seeAlso ?ggdbgene ;
-                       dcterms:description ?description .
-  ?ggdbgene ggdb_owl:has_acceptor_substrates ?acceptorSubstrate .
-  ?acceptorSubstrate ggdb_owl:has_reaction ?reaction ;
-                     rdf:type ggdb_owl:Reference .
-  ?reaction rdf:type ?reaction_type .
-  ?reaction ggdb_owl:has_acceptor ?acceptor ;
-            ggdb_owl:has_donor ?donor ;
-            ggdb_owl:has_product ?product .
-  ?acceptor dcterms:identifier ?acceptor_jcggdbglycan .#;
-            #foaf:depiction ?jcggglycanpng .
-  ?product dcterms:identifier ?product_jcggdbglycan .
-  ?gtc_jcgg1 dcterms:identifier ?acceptor_jcggdbglycan .
-  ?acceptor_gtcid glycan:has_resource_entry ?gtc_jcgg1 .
-  ?acceptor_gtcid rdf:type glycan:Saccharide .
-  ?gtc_jcgg2 dcterms:identifier ?product_jcggdbglycan .
-  ?product_gtcid glycan:has_resource_entry ?gtc_jcgg2 .
-  ?acceptor_gtcid2 rdf:type glycan:Saccharide .
-  #FILTER CONTAINS (?reaction_type, STR(General_reaction) )
-         
+           a glycan:Glycogene ;
+           dcterms:description ?description ;
+           glycan:has_taxon taxonomy:9606 .
+  ?glycogene_id sio:SIO_000255 ?b .
+  ?b up:classifiedWith ?go .
+  ?go rdfs:label ?go_term_mf . #below this, FROM2,3 are needed
+  ?go go:id ?go_id . 
+  ?go go:hasOBONamespace "molecular_function" .
+  OPTIONAL{
+      ?b dcterms:references ?pmid_uri .
+    }
+  OPTIONAL{
+      ?b sio:SIO_000772 ?eco .
+      ?eco go:hasExactSynonym ?evi_label .
+      ?eco go:id ?evi_code .
+      BIND(IRI(CONCAT("https://evidenceontology.org/term/",?evi_code)) AS ?evi_url)
+      FILTER(REGEX(?evi_label,"^[A-Z]{3}$"))
+    }
+  BIND((CONCAT(?evi_label, ":", ?evi_code)) AS ?evidence) #evidenceがOPTIONALで取得できないためこの行に記述
+  BIND(REPLACE(STR(?pmid_uri), "http://identifiers.org/pubmed/", "") AS ?pmid_id)
+  BIND(IF(isIRI(?glycogene_id),STRAFTER(STR(?glycogene_id),"glycogene/"),STR(?glycogene_id)) AS ?gene_idStr)
+  
 }
-LIMIT 50
+```
+
+## Output
+```javascript
+
+({
+  json({ ncbi2glyco }) {
+    return ncbi2glyco.results.bindings.map((row) => {
+      let evi_array = [];
+      let evi_arrays = [];
+      let pmid_array = [];
+      let pmid_arrays = [];
+      
+      //glycosmos geneのリンク
+      let glycogene = row.gene_idStr.value;
+      let glycogene_url = "https://glycosmos.org/genes/" + glycogene;
+      
+      // エビデンスが存在するかをチェック
+      //if (row.evidences?.value) {
+      //  evi_array = row.evidences.value.split('|');
+      //}
+      
+      // 不要な要素を削除（１つめの:を削除）
+      //if (evi_array[0] === ":") {
+      //  evi_array.splice(0, 1);
+      //}
+      
+      // エビデンス配列を処理
+      //evi_array.forEach((value) => {
+      //  let label = value.substr(0, value.indexOf(':'));       
+      //  if (label === label.toUpperCase()) {
+      //    let id = value.substr(value.indexOf(':') + 1);
+        //  let id_url = "https://evidenceontology.org/term/" + id;
+         // evi_arrays.push({
+          //  "label": label,
+          //  "id": id,
+          //  "id_url": id_url
+         // });
+       // }
+     // });
+      
+      //PMIDが存在するかをチェック
+      //if(row.pmid_ids.value){
+      //  pmid_array = row.pmid_ids.value.split(',');
+      //}
+      //PMID配列を処理
+      //pmid_array.forEach((pmid_id) => {
+      //  let pmid_uri = pmid_id ? "http://identifiers.org/pubmed/" + pmid_id : "";
+      //  pmid_arrays.push({
+      //    "id": pmid_id,
+      //    "uri": pmid_uri
+      //  });
+     // });
+
+      // 各プロパティの存在をチェックし、デフォルト値を設定
+      return {
+        "glycosmosgene": glycogene_url,
+        "gene_id": row.gene_idStr?.value || "",
+        "ncbigene_description": row.description?.value || "",
+        "go_term_mf": row.go_term_mf?.value || "",
+        "go": row.go?.value || "",
+        "evidence":row.evidence?.value || "",
+        "evidence_url":row.evi_url?.value || "",
+        //"evidence_code": evi_arrays,
+        //"pmid": pmid_arrays
+      };
+    });
+  }
+});
+
 ```

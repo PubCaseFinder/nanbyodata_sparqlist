@@ -1,5 +1,6 @@
-# NANDOのリンク情報を表示する (OMIM)
-## Parameters
+# Get OMIM ID by NANDO ID
+
+## parameters
 * `nando_id` NANDO ID
   * default: 2200053
 
@@ -37,12 +38,14 @@ WHERE {
 
     # 日本語ラベルの取得
     OPTIONAL {
+      ?nando skos:closeMatch|skos:exactMatch ?mondo .
       ?mondo rdfs:label ?mondo_label_ja .
       FILTER (lang(?mondo_label_ja) = "ja")
     }
 
     # 英語ラベルの取得、または言語タグがない場合
     OPTIONAL {
+      ?nando skos:closeMatch|skos:exactMatch ?mondo .
       ?mondo rdfs:label ?mondo_label_en .
       FILTER (lang(?mondo_label_en) = "en" || lang(?mondo_label_en) = "")
     }
@@ -69,11 +72,15 @@ WHERE {
       let originalDisease = d.exactMatch_disease ? d.exactMatch_disease.value : null;
       let modifiedDisease = originalDisease;
 
-      if (modifiedDisease && modifiedDisease.includes("https://omim.org/entry/")) {
-        modifiedDisease = modifiedDisease.replace("https://omim.org/entry/", "OMIM:");
+      if (modifiedDisease) {
+        if (modifiedDisease.includes("https://omim.org/entry/")) {
+          modifiedDisease = modifiedDisease.replace("https://omim.org/entry/", "OMIM:");
+        } else if (modifiedDisease.includes("https://omim.org/phenotypicSeries/")) {
+          modifiedDisease = modifiedDisease.replace("https://omim.org/phenotypicSeries/PS", "OMIMPS:");
+        }
       }
 
-      let nando = d.nando ? d.nando.value.replace( "http://nanbyodata.jp/ontology/NANDO_", "NANDO:") : null;
+      let nando = d.nando ? d.nando.value.replace("http://nanbyodata.jp/ontology/NANDO_", "NANDO:") : null;
       let mondo_id = d.mondo_id ? d.mondo_id.value : null;
 
       // nando, mondo_id, originalDisease のすべてが存在する場合のみJSONを生成
@@ -95,6 +102,7 @@ WHERE {
         let originalDiseaseNode = {
           id: modifiedDisease,
           displayid: modifiedDisease,
+          mondolink: d.mondo ? d.mondo.value : null,
           parent: mondo_id,
           property: d.property ? d.property.value : null,
           mondo_label_ja2: d.mondo_label_ja ? d.mondo_label_ja.value : null,
@@ -112,4 +120,7 @@ WHERE {
   return tree;
 };
 
+
 ```
+## Description
+- NanbyoDataでMONDOIDを経由してOMIMIDを表示させるためのSPARQListです。2024/11/19 高月

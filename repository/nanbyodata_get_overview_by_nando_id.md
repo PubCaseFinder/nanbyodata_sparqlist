@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -89,7 +89,7 @@ LIMIT 100
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `inheritance` retrieve inheritances associated with the mondo uri
 
@@ -119,7 +119,7 @@ order by ?inheritance
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-pubcasefinder.dbcls.jp/sparql/
 
 ## `result` retrieve a NANDO class
 
@@ -391,6 +391,7 @@ WHERE {
 ```
 
 ## Description
+- 2024/11/22 NANDO改変に伴い修正
 - 2024/08 HPOのinheritanceのデータが変わったことにより、申さんの方で本番環境を修正したため、本番環境よりコピー
 - 2024/04/24 inheritanceの英語ラベルが取れるように変更、シノニムのソートを追加
 - 2024/03/21 タイトルを変更　旧：nanbyodata_get_metadata　及び　SPARQL修正

@@ -1,4 +1,4 @@
-# Retrieve Gene informations by the given NANDO ID
+# HPにアップロードする遺伝子ファイルを作成する（TXT)
 
 ## Endpoint
 https://dev-pubcasefinder.dbcls.jp/sparql/
@@ -60,7 +60,7 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT DISTINCT ?mondo_uri ?mondo_id ?mondo_label ?gene_id ?hgnc_gene_symbol ?ncbi_id ?omim_id ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
+SELECT DISTINCT ?hgnc_gene_symbol  ?nando_idb
 WHERE {
   {
     SELECT ?disease ?mondo_uri ?mondo_id ?mondo_label ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
@@ -86,7 +86,7 @@ WHERE {
         }
         ?nando_ida rdfs:label ?nando_label_ja ;
                    rdfs:label ?nando_label_en.
-        FILTER(STRSTARTS(?nando_idb, "{{nando_id_list}}"))
+        FILTER(STRSTARTS(?nando_idb, "NANDO:1"))
         FILTER(lang(?nando_label_ja) = "ja")
         FILTER(lang(?nando_label_en) = "en")
       }
@@ -105,12 +105,6 @@ ORDER BY ?nando_ida ?hgnc_gene_symbol
 ```
 
 ## Description
-- 2024/10/31 OMIMのURLが変更になったとの事で修正
-- 2024/09/10 MONDOの日本語追加によるSPARLの修正を追加
-- 2024/05/13 名称を変更
-- nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id
-- UIで遺伝子データを表示させるためのSPARQListです。
-- NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。
-- 編集：高月（2024/01//12)
+- 2024/11/20設定
 
 

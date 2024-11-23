@@ -121,20 +121,28 @@ ORDER BY ?nando_id
     });
   }
 
-  // 3. parent の値が nando_sub にない場合は除外
-  tree = tree.filter(node => !node.parent || nandoSubSet.has(node.parent));
+  // 3. parent の値が nando_sub にない場合は除外し、親も連鎖的に除外
+  let invalidParents = new Set();
+  tree.forEach(node => {
+    if (node.parent && !nandoSubSet.has(node.parent)) {
+      invalidParents.add(node.parent);
+    }
+  });
+
+  // 連鎖的に除外
+  let filteredTree = tree.filter(node => !invalidParents.has(node.id) && (!node.parent || nandoSubSet.has(node.parent)));
 
   // 4. 重複する ?nando の id がある場合、parent がないものを優先して残す
   let finalTree = [];
   let nandoIdCount = {};
 
   // 各 id の出現回数を確認
-  tree.forEach(node => {
+  filteredTree.forEach(node => {
     nandoIdCount[node.id] = (nandoIdCount[node.id] || 0) + 1;
   });
 
   // 重複する場合、parent がないものを優先
-  tree.forEach(node => {
+  filteredTree.forEach(node => {
     if (nandoIdCount[node.id] > 1) {
       if (node.parent === undefined) {  // parent フィールドがないものを優先
         finalTree.push(node);
@@ -146,6 +154,5 @@ ORDER BY ?nando_id
 
   return finalTree;
 }
-
 
 ```

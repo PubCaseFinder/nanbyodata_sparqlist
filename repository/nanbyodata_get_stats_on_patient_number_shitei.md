@@ -1,4 +1,4 @@
-#Number of patients with designated intractable diseases
+# Get stats on patient number shitei
 
 ## Endpoint
 

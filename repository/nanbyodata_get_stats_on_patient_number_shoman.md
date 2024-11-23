@@ -1,4 +1,5 @@
-#Number of children with chronic diseases
+# Get stats on patient number shoman
+- 小児慢性の受給者数の一覧を表示する
 
 ## Endpoint
 

@@ -7,7 +7,7 @@
   * examples: 1200061
   
 ## Endpoint
-https://togodx.dbcls.jp/human/sparql
+https://pubcasefinder.dbcls.jp/sparql/
 
 ## `nando2mondo2medgen`
 ```sparql
@@ -20,10 +20,16 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT DISTINCT ?mondo ?medgen_id ?medgen_cid 
 WHERE {
-  GRAPH <http://rdf.integbio.jp/dataset/togosite/nando>{ 
-      nando:{{nando_id}} skos:closeMatch ?mondo .
+  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{ 
+       {
+       nando:{{nando_id}} skos:closeMatch ?mondo .
     }
-  GRAPH <http://rdf.integbio.jp/dataset/togosite/medgen>{ 
+    UNION
+    {
+       nando:{{nando_id}} skos:exactMatch ?mondo .
+    }
+    }
+  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/medgen>{ 
     ?medgen_uri
     dct:identifier ?medgen ;
     mo:mgconso ?mgconso .
@@ -134,6 +140,7 @@ WHERE {
 
 ```
 ## Description
+- NANDO改変に伴う変更　2024/11/22
 - APIの名前の変更（2024/06/27)
 - NanbyoDataでヴァリアントの情報を表示させるために利用しているSPARQListです。
 - Togovarのエンドポイントを利用しています。

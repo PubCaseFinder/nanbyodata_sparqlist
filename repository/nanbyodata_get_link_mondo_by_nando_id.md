@@ -1,4 +1,4 @@
-# NANDOのリンク情報を表示する（MONDO）
+# Get MONDO ID by NANDO ID
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200053
@@ -90,3 +90,5 @@ OPTIONAL {
 
 
 ```
+## Description
+- NanbyoDataでMONDOIDを表示させるためのSPARQListです。2024/11/19 高月
