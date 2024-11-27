@@ -2,7 +2,7 @@
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200093
-  * examples: 1200147
+  * examples: 1200431、1200147
 ## Endpoint
 https://dev-pubcasefinder.dbcls.jp/sparql/
 ## `nando2mondo` get mondo_id correspoinding to nando_id
@@ -141,10 +141,10 @@ PREFIX up: <http://purl.uniprot.org/core/>
 PREFIX go: <http://www.geneontology.org/formats/oboInOwl#>
 
 
-SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf ?evi_url ?evidence ?pmid_id ?pmid#?go_id ?evi_url ?evi_code
+SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf #?evi_url ?evidence ?pmid_id ?pmid#?go_id ?evi_url ?evi_code
 #(GROUP_CONCAT(DISTINCT ?evidence ; separator = "|") AS ?evidences) 
 #(GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
-#(GROUP_CONCAT(DISTINCT IRI(?pmid_uri) ; SEPARATOR = ",") AS ?pmid_uris)
+(GROUP_CONCAT(DISTINCT IRI(?pmid_uri) ; SEPARATOR = ",") AS ?pmid_uris)
 FROM<http://rdf.glycosmos.org/glycogenes> #FROM1
 FROM <http://purl.obolibrary.org/obo/go.owl> #FROM2
 FROM <http://purl.obolibrary.org/obo/eco.owl> #FROM3
@@ -177,6 +177,8 @@ WHERE{
   BIND(IF(isIRI(?glycogene_id),STRAFTER(STR(?glycogene_id),"glycogene/"),STR(?glycogene_id)) AS ?gene_idStr)
   
 }
+#GROUP BY ?glycogene_id
+ORDER BY DESC (?glycogene_id)
 ```
 
 ## Output
@@ -189,6 +191,7 @@ WHERE{
       let evi_arrays = [];
       let pmid_array = [];
       let pmid_arrays = [];
+      let pmiduri_array = [];
       
       //glycosmos geneのリンク
       let glycogene = row.gene_idStr.value;
@@ -222,6 +225,10 @@ WHERE{
       //if(row.pmid_ids.value){
       //  pmid_array = row.pmid_ids.value.split(',');
       //}
+      ////PMID URIが存在するかをチェック
+      ////if(row.pmid_uris.value){
+      ////  pmiduri_array = row.pmid_uris.value.split(',');
+      ////}
       //PMID配列を処理
       //pmid_array.forEach((pmid_id) => {
       //  let pmid_uri = pmid_id ? "http://identifiers.org/pubmed/" + pmid_id : "";
@@ -238,8 +245,9 @@ WHERE{
         "ncbigene_description": row.description?.value || "",
         "go_term_mf": row.go_term_mf?.value || "",
         "go": row.go?.value || "",
-        "evidence":row.evidence?.value || "",
-        "evidence_url":row.evi_url?.value || "",
+        //"evidence":row.evidence?.value || "",
+        //"evidence_url":row.evi_url?.value || "",
+        "pmid_uri" :row.pmid_uris?.value || ""
         //"evidence_code": evi_arrays,
         //"pmid": pmid_arrays
       };

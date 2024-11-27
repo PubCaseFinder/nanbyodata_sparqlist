@@ -2,7 +2,7 @@
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200093
-  * examples: 1200147
+  * examples: 1200431、1200147
 ## Endpoint
 https://dev-pubcasefinder.dbcls.jp/sparql/
 ## `nando2mondo` get mondo_id correspoinding to nando_id

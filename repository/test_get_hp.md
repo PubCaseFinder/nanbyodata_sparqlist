@@ -98,53 +98,132 @@ WHERE {
 ```
 ## Output
 
-```javascript
-function processResults(nando2mondo, phenotype) {
-  // 入力データの検証
-  if (!Array.isArray(nando2mondo) || !Array.isArray(phenotype)) {
-    throw new Error("Invalid input: `nando2mondo` and `phenotype` must be arrays.");
-  }
+```html
 
-  const nandoToMondoMap = {};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nando to HPO Mapping</title>
+</head>
+<body>
+    <h1>Nando to HPO Mapping Results</h1>
+    <pre id="results"></pre> <!-- 結果を表示する場所 -->
 
-  // `nando2mondo` から nando_id と mondo_id を対応付け
-  nando2mondo.forEach(row => {
-    if (row && row.nandoid && row.nandoid.value) {
-      const nando_id = row.nandoid.value;
-      const mondo_id = row.mondo_id ? row.mondo_id.value.replace("MONDO:", "MONDO_") : null;
+    <script>
+        // データの仮定したSPARQLクエリ結果
+        const nando2mondoResults = [
+            { nando: "nando:001", mondo_id: "MONDO:00001" },
+            { nando: "nando:002", mondo_id: "MONDO:00002" },
+            { nando: "nando:003", mondo_id: "MONDO:00003" }, // 対応なしデータ
+        ];
 
-      if (!nandoToMondoMap[nando_id]) {
-        nandoToMondoMap[nando_id] = {
-          nando_id,
-          mondo_id,
-          hpo_ids: []
-        };
-      }
-    }
-  });
+        const phenotypeResults = [
+            { mondo_id: "MONDO_00001", hpo_id: "HP:0004322" },
+            { mondo_id: "MONDO_00001", hpo_id: "HP:0001250" },
+            { mondo_id: "MONDO_00002", hpo_id: "HP:0004322" },
+        ];
 
-  // `phenotype` から hpo_id を対応付け
-  phenotype.forEach(row => {
-    if (row && row.mondo_uri && row.mondo_uri.value && row.hpo_id && row.hpo_id.value) {
-      const mondo_uri = row.mondo_uri.value.replace("obo:", "MONDO_");
-      const hpo_id = row.hpo_id.value;
-
-      Object.values(nandoToMondoMap || {}).forEach(entry => {
-        if (entry.mondo_id === mondo_uri) {
-          entry.hpo_ids.push(hpo_id);
+        // データ検証関数
+        function validateData(data, name) {
+            if (!data || data.length === 0) {
+                console.error(`${name} is missing or empty.`);
+                return false;
+            }
+            return true;
         }
-      });
-    }
-  });
 
-  // 結果を JSON 形式に整形
-  const result = Object.values(nandoToMondoMap || {}).map(entry => ({
-    nando_id: entry.nando_id,
-    hpo_ids: entry.hpo_ids.length > 0 ? entry.hpo_ids : ["NA"]
-  }));
+        // フォーマット統一関数
+        function normalizeMondoId(mondoId) {
+            if (mondoId.includes("_")) {
+                return mondoId.replace("_", ":");
+            } else if (mondoId.includes(":")) {
+                return mondoId.replace(":", "_");
+            }
+            return mondoId;
+        }
 
-  return result;
-}
+        // nandoとhpoの対応付けを行う関数
+        function mapNandoToHpo(nando2mondo, phenotype) {
+            const result = [];
+
+            nando2mondo.forEach((nandoItem) => {
+                if (!nandoItem.mondo_id) {
+                    console.warn(`Missing mondo_id for nando: ${nandoItem.nando}`);
+                    result.push({
+                        nando: nandoItem.nando,
+                        mondo_id: nandoItem.mondo_id || "No MONDO ID",
+                        hpo_id: "No associated HPO",
+                    });
+                    return;
+                }
+
+                // `nandoItem.mondo_id`を統一
+                const normalizedMondoId = normalizeMondoId(nandoItem.mondo_id);
+
+                // phenotypeResultsから対応するmondo_idを探す
+                const relatedPhenotypes = phenotype.filter(
+                    (phenotypeItem) =>
+                        normalizeMondoId(phenotypeItem.mondo_id) === normalizedMondoId
+                );
+
+                if (relatedPhenotypes.length > 0) {
+                    // 対応がある場合
+                    relatedPhenotypes.forEach((phenotypeItem) => {
+                        result.push({
+                            nando: nandoItem.nando,
+                            mondo_id: nandoItem.mondo_id,
+                            hpo_id: phenotypeItem.hpo_id,
+                        });
+                    });
+                } else {
+                    // 対応がない場合
+                    result.push({
+                        nando: nandoItem.nando,
+                        mondo_id: nandoItem.mondo_id,
+                        hpo_id: "No associated HPO",
+                    });
+                }
+            });
+
+            return result;
+        }
+
+        // 実行処理
+        function main() {
+            // データ検証
+            if (
+                !validateData(nando2mondoResults, "nando2mondoResults") ||
+                !validateData(phenotypeResults, "phenotypeResults")
+            ) {
+                return; // エラー時は処理を終了
+            }
+
+            // マッピング処理
+            const nandoToHpoMapping = mapNandoToHpo(nando2mondoResults, phenotypeResults);
+
+            // 結果をテキスト形式に変換
+            const resultText = nandoToHpoMapping
+                .map(
+                    (item) =>
+                        `${item.nando}\t${item.mondo_id}\t${item.hpo_id}`
+                )
+                .join("\n");
+
+            console.log("Mapping Results:");
+            console.log(resultText);
+
+            // 結果をWebページに表示
+            document.getElementById("results").textContent = resultText;
+        }
+
+        // 実行
+        main();
+    </script>
+</body>
+</html>
+
 
 
 

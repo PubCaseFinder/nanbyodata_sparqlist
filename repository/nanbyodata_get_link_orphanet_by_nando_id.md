@@ -62,56 +62,64 @@ WHERE {
 ```javascript
 
 ({ result }) => {
-  let tree = [];
+  const tree = [];
 
-  if (result && result.results && result.results.bindings) {
-    result.results.bindings.forEach(d => {
-      let originalDisease = d.exactMatch_disease ? d.exactMatch_disease.value : null;
-      let modifiedDisease = originalDisease;
+  if (!result?.results?.bindings) return tree;
 
-      if (modifiedDisease && modifiedDisease.includes("http://www.orpha.net/ORDO/Orphanet_")) {
-        modifiedDisease = modifiedDisease.replace("http://www.orpha.net/ORDO/Orphanet_", "Orphanet:");
+  const replacePrefix = (value, prefix, replacement) =>
+    value?.startsWith(prefix) ? value.replace(prefix, replacement) : value;
+
+  const isDuplicate = (arr, criteria) => arr.some(item =>
+    Object.keys(criteria).every(key => item[key] === criteria[key])
+  );
+
+  result.results.bindings.forEach(d => {
+    const originalDisease = d.exactMatch_disease?.value ?? null;
+    const modifiedDisease = replacePrefix(originalDisease, "http://www.orpha.net/ORDO/Orphanet_", "Orphanet:");
+    const nando = replacePrefix(d.nando?.value, "http://nanbyodata.jp/ontology/NANDO_", "NANDO:");
+    const mondo_id = d.mondo_id?.value ?? null;
+
+    if (nando && mondo_id && originalDisease) {
+      // 親ノードを追加する際に重複チェック
+      if (!isDuplicate(tree, { id: nando, type: "parent" })) {
+        tree.push({
+          id: nando,
+          uid: d.nando?.value ?? null,
+          type: "parent",
+        });
       }
 
-      let nando = d.nando ? d.nando.value.replace( "http://nanbyodata.jp/ontology/NANDO_", "NANDO:") : null;
-      let mondo_id = d.mondo_id ? d.mondo_id.value : null;
-
-      // nando, mondo_id, originalDisease のすべてが存在する場合のみJSONを生成
-      if (nando && mondo_id && originalDisease) {
-        let nandoNode = {
-          id: nando, // 親ノード (nando)
-          uid: d.nando ? d.nando.value : null,
-          type: 'parent', // 親ノードであることを示す
-        };
-
-        let mondoNode = {
-          parent: nando, // nando の子として配置
-          id: mondo_id, // 子ノード (mondo_id)
-          mondo_label_ja: d.mondo_label_ja ? d.mondo_label_ja.value : null,
-          mondo_label_en: d.mondo_label_en ? d.mondo_label_en.value : null,
+      // 子ノードを追加する際に重複チェック
+      if (!isDuplicate(tree, { parent: nando, id: mondo_id })) {
+        tree.push({
+          parent: nando,
+          id: mondo_id,
+          mondo_label_ja: d.mondo_label_ja?.value ?? null,
+          mondo_label_en: d.mondo_label_en?.value ?? null,
           mondo_url: mondo_id.replace("MONDO:", "https://monarchinitiative.org/MONDO:"),
-        };
+        });
+      }
 
-        let originalDiseaseNode = {
+      // 原疾患ノードを追加
+      if (!isDuplicate(tree, { id: modifiedDisease, parent: mondo_id })) {
+        tree.push({
           id: modifiedDisease,
           displayid: modifiedDisease,
-          mondolinki: d.mondo ? d.mondo.value : null,
-          property: d.property ? d.property.value : null,
+          mondolinki: d.mondo?.value ?? null,
+          property: d.property?.value ?? null,
           parent: mondo_id,
-          mondo_label_ja2: d.mondo_label_ja ? d.mondo_label_ja.value : null,
-          mondo_label_en2: d.mondo_label_en ? d.mondo_label_en.value : null,
-          original_disease: originalDisease,
-        };
-
-        tree.push(nandoNode);
-        tree.push(mondoNode);
-        tree.push(originalDiseaseNode);
+          mondo_label_ja2: d.mondo_label_ja?.value ?? null,
+          mondo_label_en2: d.mondo_label_en?.value ?? null,
+          original_disease: replacePrefix(originalDisease, "http://www.orpha.net/ORDO/Orphanet_", "https://www.orpha.net/en/disease/detail/"),
+        });
       }
-    });
-  }
+    }
+  });
 
   return tree;
 };
+
+
 
 
 ```
