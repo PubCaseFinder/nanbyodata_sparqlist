@@ -69,6 +69,16 @@ OPTIONAL {
           type: 'parent', // 親ノードであることを示す
         };
 
+        // 重複チェック: `id` と `uid` が一致するものがないか確認
+        let isNandoNodeExists = tree.some(
+          node => node.id === nandoNode.id && node.uid === nandoNode.uid
+        );
+
+        // 重複がない場合のみ追加
+        if (!isNandoNodeExists) {
+          tree.push(nandoNode);
+        }
+
         let mondoNode = {
           parent: nando, // nando の子として配置
           id: mondo_id, // 子ノード (mondo_id)
@@ -79,7 +89,6 @@ OPTIONAL {
           mondo_url: mondo_id.replace("MONDO:", "https://monarchinitiative.org/MONDO:"),
         };
 
-        tree.push(nandoNode);
         tree.push(mondoNode);
       }
     });

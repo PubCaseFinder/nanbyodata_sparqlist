@@ -78,7 +78,7 @@ WHERE {
       if (modifiedDisease) {
         if (modifiedDisease.includes("http://www.ncbi.nlm.nih.gov/medgen/")) {
           modifiedDisease = modifiedDisease.replace("http://www.ncbi.nlm.nih.gov/medgen/", "MedGen UID:");
-        } 
+        }
       }
 
       let nando = d.nando ? d.nando.value.replace("http://nanbyodata.jp/ontology/NANDO_", "NANDO:") : null;
@@ -92,6 +92,16 @@ WHERE {
           type: 'parent', // 親ノードであることを示す
         };
 
+        // 重複チェック: `id` と `uid` の組み合わせが既に存在するか
+        let isNandoNodeExists = tree.some(
+          node => node.id === nandoNode.id && node.uid === nandoNode.uid
+        );
+
+        // 重複がない場合のみ追加
+        if (!isNandoNodeExists) {
+          tree.push(nandoNode);
+        }
+
         let mondoNode = {
           parent: nando, // nando の子として配置
           id: mondo_id, // 子ノード (mondo_id)
@@ -100,10 +110,20 @@ WHERE {
           mondo_url: mondo_id.replace("MONDO:", "https://monarchinitiative.org/MONDO:"),
         };
 
+        // 子ノードの重複チェック: `parent` と `id` の組み合わせが既に存在するか
+        let isMondoNodeExists = tree.some(
+          node => node.parent === mondoNode.parent && node.id === mondoNode.id
+        );
+
+        // 重複がない場合のみ追加
+        if (!isMondoNodeExists) {
+          tree.push(mondoNode);
+        }
+
         let originalDiseaseNode = {
-          id: modifiedDisease,
-          displayid: modifiedDisease,
-          displayid2: d.concept_id ? d.concept_id.value : null,
+          id: d.concept_id ? d.concept_id.value : null,
+          displayid2: modifiedDisease,
+          displayid: d.concept_id ? d.concept_id.value : null,
           mondolink: d.mondo ? d.mondo.value : null,
           parent: mondo_id,
           property: d.property ? d.property.value : null,
@@ -112,15 +132,23 @@ WHERE {
           original_disease: originalDisease,
         };
 
-        tree.push(nandoNode);
-        tree.push(mondoNode);
-        tree.push(originalDiseaseNode);
+        // 原疾患ノードの重複チェック: `id` と `parent` の組み合わせが既に存在するか
+        let isOriginalDiseaseNodeExists = tree.some(
+          node => node.id === originalDiseaseNode.id && node.parent === originalDiseaseNode.parent
+        );
+
+        // 重複がない場合のみ追加
+        if (!isOriginalDiseaseNodeExists) {
+          tree.push(originalDiseaseNode);
+        }
       }
     });
   }
 
   return tree;
 };
+
+
 
 ```
 ## Description
