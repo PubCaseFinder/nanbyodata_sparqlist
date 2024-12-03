@@ -30,7 +30,7 @@ DISTINCT ?id_plain as ?ID
 ?description_j_plain as ?Description_j 
 FROM <http://metadb.riken.jp/db/xsearch_cell_brso>
 WHERE {
- ?cell dct:identifier ?id;
+  ?cell dct:identifier ?id;
     foaf:homepage ?hp;
     dc:description ?description_e;
     dc:description ?description_j;
@@ -42,9 +42,9 @@ WHERE {
 	BIND (STR(?cell_label) as ?cell_label_plain)
 	BIND (STR(?description_e) as ?description_e_plain)	
 	BIND (STR(?description_j) as ?description_j_plain)	
- ?donor obo:RO_0000091 ?disease. # <http://purl.obolibrary.org/obo/RO_0000091>
- OPTIONAL {?disease rdfs:seeAlso ?ontology}
- FILTER (CONTAINS(STR(?ontology), "{{nando_id}}"))
+  ?donor obo:RO_0000091 ?disease. # <http://purl.obolibrary.org/obo/RO_0000091>
+  OPTIONAL {?disease rdfs:seeAlso ?ontology}
+  FILTER (CONTAINS(STR(?ontology), "{{nando_id}}"))
 }
  ORDER BY ?ID
 

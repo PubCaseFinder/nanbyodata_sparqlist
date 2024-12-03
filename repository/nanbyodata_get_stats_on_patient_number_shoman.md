@@ -3,7 +3,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `result` 
 ```sparql
@@ -15,22 +15,24 @@ PREFIX sio: <http://semanticscience.org/resource/>
 
 SELECT DISTINCT ?s ?year ?num_of_patients  ?nando ?label ?label_en ?number
 WHERE{
-graph<https://pubcasefinder.dbcls.jp/rdf/nanbyodata>{
-  ?s sio:SIO_000216 ?year_data .
-  ?year_data  nando:has_aYearOfStatistics/sio:SIO_000300 ?year .
-  ?year_data nando:has_theNumberOfPatients/sio:SIO_000300 ?num_of_patients.}
+  GRAPH <https://nanbyodata.jp/rdf/nanbyodata> {
+    ?s sio:SIO_000216 ?year_data .
+    ?year_data  nando:has_aYearOfStatistics/sio:SIO_000300 ?year .
+    ?year_data nando:has_theNumberOfPatients/sio:SIO_000300 ?num_of_patients.
+  }
 
-graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
-   ?s dcterms:identifier ?nando.
-     BIND (SUBSTR(?nando, 7, 1) AS ?nando1)
-     FILTER REGEX(?nando1,"2")
-   ?s rdfs:label ?label .
+  GRAPH <https://nanbyodata.jp/rdf/ontology/nando> {
+    ?s dcterms:identifier ?nando.
+    BIND (SUBSTR(?nando, 7, 1) AS ?nando1)
+    FILTER REGEX(?nando1,"2")
+    ?s rdfs:label ?label .
     FILTER (lang(?label) = "ja") .
-    OPTIONAL {    ?s rdfs:label ?label_en .
-                FILTER (lang(?label_en) = "en")
+    OPTIONAL {
+      ?s rdfs:label ?label_en .
+      FILTER (lang(?label_en) = "en")
     }
     OPTIONAL {?s nando:hasNotificationNumber ?number.}
-}
+  }
 } ORDER BY ?nando ?year
 
 ```

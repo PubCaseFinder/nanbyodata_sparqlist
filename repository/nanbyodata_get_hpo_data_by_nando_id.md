@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -23,17 +23,13 @@ PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
 SELECT *
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
-    {
-      ?nando skos:closeMatch ?mondo .
-    }
-    UNION
-    {
-      ?nando skos:exactMatch ?mondo .
-    }
+    ?nando skos:exactMatch | skos:closeMatch ?mondo .
     ?mondo oboInOwl:id ?mondo_id
   }
    }
@@ -63,7 +59,7 @@ WHERE {
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `phenotype` retrieve phenotypes associated with the mondo uri
 
@@ -76,13 +72,17 @@ PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 
 SELECT DISTINCT
-?hpo_category
-?hpo_category_name_en
-?hpo_category_name_ja
-?hpo_id
-?hpo_url
-?hpo_label_en
-?hpo_label_ja
+  ?hpo_category
+  ?hpo_category_name_en
+  ?hpo_category_name_ja
+  ?hpo_id
+  ?hpo_url
+  ?hpo_label_en
+  ?hpo_label_ja
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/ontology/hp>
+FROM <https://nanbyodata.jp/rdf/pcf>
 WHERE { 
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
@@ -94,7 +94,7 @@ WHERE {
       dcterms:source [dcterms:creator ?creator] .
   FILTER(?creator NOT IN("Database Center for Life Science"))
     
-  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/hp>{
+  GRAPH <https://nanbyodata.jp/rdf/ontology/hp> {
     optional { ?hpo_category rdfs:subClassOf obo:HP_0000118 . }
     ?hpo_category rdfs:label ?hpo_category_name_en .
     ?hpo_url rdfs:subClassOf+ ?hpo_category .
@@ -103,10 +103,16 @@ WHERE {
     ?hpo_url obo:IAO_0000115 ?definition .
   }
     
-  optional { ?hpo_category rdfs:label ?hpo_category_name_ja . FILTER (lang(?hpo_category_name_ja) = "ja") }
-  optional { ?hpo_url rdfs:label ?hpo_label_ja . FILTER (lang(?hpo_label_ja) = "ja") }    
+  OPTIONAL {
+    ?hpo_category rdfs:label ?hpo_category_name_ja .
+    FILTER (lang(?hpo_category_name_ja) = "ja")
+  }
+  OPTIONAL {
+    ?hpo_url rdfs:label ?hpo_label_ja .
+    FILTER (lang(?hpo_label_ja) = "ja")
+  }    
 }
-order by ?hpo_category_name_en ?hpo_label_ja
+ORDER BY ?hpo_category_name_en ?hpo_label_ja
 ```
 ## Output
 

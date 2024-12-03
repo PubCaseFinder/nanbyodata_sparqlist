@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 
@@ -23,11 +23,13 @@ PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
 SELECT *
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   OPTIONAL {
-    ?nando skos:closeMatch|skos:exactMatch ?mondo .
+    ?nando skos:closeMatch | skos:exactMatch ?mondo .
     ?mondo oboInOwl:id ?mondo_id
   }
 }
@@ -56,7 +58,7 @@ WHERE {
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `medgen` retrieve information from medgen
 
@@ -70,6 +72,9 @@ prefix nci: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
 prefix dct: <http://purl.org/dc/terms/>
 
 SELECT DISTINCT ?medgen ?concept ?concept_id ?concept_name ?definition (GROUP_CONCAT(?label, ":") AS ?labels) ?mondo_uri AS ?mondo
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/pcf>
+FROM <https://nanbyodata.jp/rdf/medgen>
 WHERE {
   VALUES ?mondo_uri { {{mondo_uri_list}} }
   ?mgconso rdfs:seeAlso ?mondo_uri ;
@@ -89,7 +94,7 @@ LIMIT 100
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `inheritance` retrieve inheritances associated with the mondo uri
 
@@ -103,6 +108,9 @@ PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 
 SELECT distinct ?inheritance ?inheritance_ja ?inheritance_en
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/pcf>
 WHERE{
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
@@ -110,16 +118,22 @@ WHERE{
 
   ?disease rdfs:seeAlso ?mondo_uri ;
            nando:hasInheritance ?inheritance .
-  optional { ?inheritance rdfs:label ?inheritance_ja . FILTER (lang(?inheritance_ja) = "ja") }
+  OPTIONAL {
+    ?inheritance rdfs:label ?inheritance_ja .
+    FILTER (lang(?inheritance_ja) = "ja")
+  }
   #optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
-  optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "") }
+  OPTIONAL {
+    ?inheritance rdfs:label ?inheritance_en .
+    FILTER (lang(?inheritance_en) = "")
+  }
 }
-order by ?inheritance
+ORDER BY ?inheritance
 ```
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `result` retrieve a NANDO class
 
@@ -138,6 +152,8 @@ PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 
 SELECT DISTINCT ?nando ?nando_id ?label_ja ?label_hira ?label_en ?alt_label_ja ?alt_label_en ?notification_number 
                 ?source ?description ?mondo ?mondo_id ?mondo_description ?site ?db_xref ?altLabel
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 WHERE {
   ?nando a owl:Class ;
     dcterms:identifier "NANDO:{{nando_id}}" .
@@ -171,19 +187,12 @@ WHERE {
     ?nando dcterms:description ?description  
   }
   OPTIONAL {
-  {
-    ?nando skos:closeMatch ?mondo .
+    ?nando skos:exactMatch | skos:closeMatch ?mondo .
+    ?mondo oboInOwl:id ?mondo_id .
+    ?mondo skos:exactMatch ?db_xref .
+    ?mondo obo:IAO_0000115 ?mondo_description .
+    ?mondo oboInOwl:hasExactSynonym ?altlabel .
   }
-  UNION
-  {
-    ?nando skos:exactMatch ?mondo .
-  }
-
-  ?mondo oboInOwl:id ?mondo_id .
-  ?mondo skos:exactMatch ?db_xref .
-  ?mondo obo:IAO_0000115 ?mondo_description .
-  ?mondo oboInOwl:hasExactSynonym ?altlabel .
-}
   OPTIONAL {
     ?nando rdfs:seeAlso ?site
   }

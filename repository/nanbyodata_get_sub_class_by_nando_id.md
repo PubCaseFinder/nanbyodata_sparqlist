@@ -5,7 +5,7 @@
   * examples: 1200005
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `result`
 ```sparql
@@ -19,6 +19,7 @@ PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
 SELECT *
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" ;
