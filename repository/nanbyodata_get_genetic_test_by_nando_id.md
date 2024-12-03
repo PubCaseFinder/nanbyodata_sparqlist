@@ -8,7 +8,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `result` 
 ```sparql
@@ -23,15 +23,15 @@ PREFIX genetest: <http://nanbyodata.jp/ontology/genetest_>
 
 SELECT DISTINCT
 ?hp ?label ?gene ?facility
-
+FROM <https://nanbyodata.jp/rdf/nanbyodata>
 WHERE {
- ?s  foaf:homepage ?hp.
- OPTIONAL{?s  rdfs:label    ?label.}
- OPTIONAL{?s  genetest:has_test ?gene.}
- OPTIONAL{?s  genetest:has_inspectionFacility ?facility.}
- ?s rdfs:seeAlso ?disease.
- FILTER (CONTAINS(STR(?disease), "{{nando_id}}"))
-     }
+  ?s  foaf:homepage ?hp.
+  OPTIONAL{?s  rdfs:label    ?label.}
+  OPTIONAL{?s  genetest:has_test ?gene.}
+  OPTIONAL{?s  genetest:has_inspectionFacility ?facility.}
+  ?s rdfs:seeAlso ?disease.
+  FILTER (CONTAINS(STR(?disease), "{{nando_id}}"))
+}
 
 ```
 

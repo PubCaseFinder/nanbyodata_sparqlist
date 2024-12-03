@@ -7,7 +7,8 @@
   * examples: 1200061
   
 ## Endpoint
-https://pubcasefinder.dbcls.jp/sparql/
+
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `nando2mondo2medgen`
 ```sparql
@@ -20,16 +21,10 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT DISTINCT ?mondo ?medgen_id ?medgen_cid 
 WHERE {
-  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{ 
-       {
-       nando:{{nando_id}} skos:closeMatch ?mondo .
-    }
-    UNION
-    {
-       nando:{{nando_id}} skos:exactMatch ?mondo .
-    }
-    }
-  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/medgen>{ 
+  GRAPH <https://nanbyodata.jp/rdf/ontology/nando> {
+    nando:{{nando_id}} skos:exactMatch | skos:closeMatch ?mondo .
+  }
+  GRAPH <https://nanbyodata.jp/rdf/medgen> { 
     ?medgen_uri
     dct:identifier ?medgen ;
     mo:mgconso ?mgconso .
@@ -38,7 +33,7 @@ WHERE {
     rdfs:seeAlso ?mondo.
     BIND (CONCAT("http://ncbi.nlm.nih.gov/medgen/",?medgen)AS ?medgen_id)
     BIND (IRI(?medgen_id)AS ?medgen_cid)
-    }
+  }
 }
  ```
  ## `medgen`

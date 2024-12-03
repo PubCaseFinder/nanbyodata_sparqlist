@@ -7,7 +7,7 @@
   * examples: 1200016,1200462
   
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `nando2mondo2mgend`
 ```sparql
@@ -25,24 +25,23 @@ PREFIX mgendo: <http://med2rdf.org/mgend/ontology#>
 PREFIX m2r: <http://med2rdf.org/ontology/med2rdf#>
 
 SELECT DISTINCT ?dbxref ?omimps ?mondo ?mondolabel ?significance ?type ?variantID ?hgvs ?vtype ?position ?ch ?mgendogeneID ?genelabel ?geneXref
- WHERE{
-  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{ 
-       OPTIONAL {
-    {
-      nando:{{nando_id}}  skos:closeMatch ?mondo .
+FROM <https://nanbyodata.jp/rdf/mgend>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+WHERE {
+  GRAPH <https://nanbyodata.jp/rdf/ontology/nando> {
+    OPTIONAL {
+      nando:{{nando_id}} skos:exactMatch | skos:closeMatch ?mondo .
     }
-    UNION
-    {
-      nando:{{nando_id}}  skos:exactMatch ?mondo .
-    }
-     }
-  GRAPH <https://pubcasefinder.dbcls.jp/rdf/ontology/mondo>{ 
+  }
+  GRAPH <https://nanbyodata.jp/rdf/ontology/mondo> {
     ?mondo rdfs:label ?mondolabel; 
     oboInOwl:hasDbXref ?dbxref.
     FILTER contains(?dbxref,'OMIMPS')
     BIND(REPLACE(?dbxref,'OMIMPS:','https://omim.org/phenotypicSeries/PS') AS ?omimps)
-    BIND(IRI(?omimps)AS ?omimuri)}
-   GRAPH <https://pubcasefinder.dbcls.jp/rdf/mgend>{
+    BIND(IRI(?omimps)AS ?omimuri)
+  }
+   GRAPH <https://nanbyodata.jp/rdf/mgend> {
     ?mgendcase rdfs:seeAlso ?omimuri.
     ?mgendcase mgendo:case_significance ?significance;
                mgendo:variant_type ?type;
@@ -56,7 +55,8 @@ SELECT DISTINCT ?dbxref ?omimps ?mondo ?mondolabel ?significance ?type ?variantI
     ?variantID m2r:gene ?mgendogeneID.
     ?mgendogeneID rdfs:label ?genelabel;
                   rdfs:seeAlso ?geneXref.              
-    }}}
+  }
+}
 ```
 ## Output
 

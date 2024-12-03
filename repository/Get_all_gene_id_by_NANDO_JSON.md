@@ -1,7 +1,7 @@
 # HPにアップロードする遺伝子ファイルを作成する（JSON)
 
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql/
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
@@ -12,20 +12,17 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+
 SELECT ?nando ?mondo ?mondo_id
 WHERE {
-  graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando>{
-   OPTIONAL {
-    {
-      ?nando skos:closeMatch ?mondo .
+  GRAPH <https://nanbyodata.jp/rdf/ontology/nando> {
+    OPTIONAL {
+      ?nando skos:exactMatch | skos:closeMatch ?mondo .  
     }
-    UNION
-    {
-      ?nando skos:exactMatch ?mondo .   
-}}}
-   
-       ?mondo oboInOwl:id ?mondo_id .
-  
+  }
+  GRAPH <https://nanbyodata.jp/rdf/ontology/mondo> {
+    ?mondo oboInOwl:id ?mondo_id .
+  }
 }
 
 ```
@@ -48,7 +45,7 @@ WHERE {
 })
 ```
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql/
 
 ## `gene` retrieve genes associated with the mondo uri
 ```sparql
@@ -61,7 +58,10 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT DISTINCT ?hgnc_gene_symbol  ?nando_idb
+SELECT DISTINCT ?hgnc_gene_symbol ?nando_idb
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/pcf>
 WHERE {
   {
     SELECT ?disease ?mondo_uri ?mondo_id ?mondo_label ?nando_ida ?nando_label_ja ?nando_label_en ?nando_idb
@@ -76,15 +76,8 @@ WHERE {
       BIND (IRI(replace(STR(?exactMatch_disease), 'https://omim.org/entry/', 'http://identifiers.org/mim/')) AS ?disease) .
 
       OPTIONAL {
-        {
-          ?nando_ida skos:closeMatch ?mondo_uri ;
-                     dcterms:identifier ?nando_idb.
-        }
-        UNION
-        {
-          ?nando_ida skos:exactMatch ?mondo_uri ;
-                     dcterms:identifier ?nando_idb.
-        }
+        ?nando_ida skos:exactMatch | skos:closeMatch ?mondo_uri ;
+                   dcterms:identifier ?nando_idb.
         ?nando_ida rdfs:label ?nando_label_ja ;
                    rdfs:label ?nando_label_en.
         FILTER(STRSTARTS(?nando_idb, "NANDO:1"))

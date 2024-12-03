@@ -5,7 +5,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `result`
 ```sparql
@@ -22,32 +22,29 @@ PREFIX nci: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
 PREFIX dct: <http://purl.org/dc/terms/>
 
 SELECT DISTINCT ?nando ?mondo ?mondo_id ?property ?medgen ?concept ?concept_id ?concept_name ?mondo_label_en ?mondo_label_ja
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/medgen>
 WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
   
   OPTIONAL {
-    {
-      ?nando skos:closeMatch ?mondo .
-    }
-    UNION
-    {
-      ?nando skos:exactMatch ?mondo .
-    }
-    ?nando ?property ?mondo.
+    ?nando skos:exactMatch | skos:closeMatch ?mondo ;
+      ?property ?mondo .
     ?mondo oboInOwl:id ?mondo_id .
   }
 
   # 日本語ラベルの取得
   OPTIONAL {
-    ?nando skos:closeMatch|skos:exactMatch ?mondo .
+    ?nando skos:closeMatch | skos:exactMatch ?mondo .
     ?mondo rdfs:label ?mondo_label_ja .
     FILTER (lang(?mondo_label_ja) = "ja")
   }
 
   # 英語ラベルの取得、または言語タグがない場合
   OPTIONAL {
-    ?nando skos:closeMatch|skos:exactMatch ?mondo .
+    ?nando skos:closeMatch | skos:exactMatch ?mondo .
     ?mondo rdfs:label ?mondo_label_en .
     FILTER (lang(?mondo_label_en) = "en" || lang(?mondo_label_en) = "")
   }
