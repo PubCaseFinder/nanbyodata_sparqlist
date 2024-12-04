@@ -97,20 +97,21 @@ WHERE {
   GRAPH <https://nanbyodata.jp/rdf/ontology/hp> {
     optional { ?hpo_category rdfs:subClassOf obo:HP_0000118 . }
     ?hpo_category rdfs:label ?hpo_category_name_en .
+    FILTER (lang(?hpo_category_name_en) = "")
     ?hpo_url rdfs:subClassOf+ ?hpo_category .
     ?hpo_url rdfs:label ?hpo_label_en .
+    FILTER (lang(?hpo_label_en) = "")
     ?hpo_url <http://www.geneontology.org/formats/oboInOwl#id> ?hpo_id .
     ?hpo_url obo:IAO_0000115 ?definition .
+    OPTIONAL {
+      ?hpo_category rdfs:label ?hpo_category_name_ja .
+      FILTER (lang(?hpo_category_name_ja) = "ja")
+    }
+    OPTIONAL {
+      ?hpo_url rdfs:label ?hpo_label_ja .
+      FILTER (lang(?hpo_label_ja) = "ja")
+    }
   }
-    
-  OPTIONAL {
-    ?hpo_category rdfs:label ?hpo_category_name_ja .
-    FILTER (lang(?hpo_category_name_ja) = "ja")
-  }
-  OPTIONAL {
-    ?hpo_url rdfs:label ?hpo_label_ja .
-    FILTER (lang(?hpo_label_ja) = "ja")
-  }    
 }
 ORDER BY ?hpo_category_name_en ?hpo_label_ja
 ```
