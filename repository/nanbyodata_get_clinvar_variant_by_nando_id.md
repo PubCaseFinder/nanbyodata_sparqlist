@@ -60,15 +60,14 @@ WHERE {
   VALUES ?med_id { {{#each medgen}} <{{this}}> {{/each}} } 
 
   GRAPH <http://togovar.org/clinvar> {
-    ?med_id ^dct:references ?_interpreted_condition .
+    ?med_id ^dct:references ?_classified_condition .
 
-    ?_interpreted_condition rdfs:label ?condition ;
-      ^cvo:interpreted_condition/^cvo:interpreted_condition_list ?_rcv .
+    ?_classified_condition ^cvo:classified_condition/^cvo:classified_condition_list ?_rcv ;
+      rdfs:label ?condition .
 
-    ?_rcv dct:identifier ?rcv ;
-      cvo:date_last_evaluated ?last_evaluated ;
-      cvo:interpretation ?interpretation ;
-      ^cvo:rcv_accession/^cvo:rcv_list/^cvo:interpreted_record ?clinvar .
+    ?_rcv cvo:rcv_classifications/cvo:germline_classification/cvo:description/cvo:description ?interpretation ;
+      cvo:rcv_classifications/cvo:germline_classification/cvo:description/cvo:date_last_evaluated ?last_evaluated ;
+      ^cvo:rcv_accession/^cvo:rcv_list/^cvo:classified_record ?clinvar .
 
     ?clinvar a cvo:VariationArchiveType ;
       rdfs:label ?title ;
@@ -90,7 +89,7 @@ WHERE {
 
   GRAPH <http://togovar.org/variant> {
    OPTIONAL{ ?variant dct:identifier ?tgv_id ;
-             rdf:type ?type.}
+                      rdf:type ?type.}
   }
 }
                     
@@ -135,6 +134,7 @@ WHERE {
 
 ```
 ## Description
+- MedGenのRDFの形式が変わったことによる変更 2024/12/05
 - NANDO改変に伴う変更　2024/11/22
 - APIの名前の変更（2024/06/27)
 - NanbyoDataでヴァリアントの情報を表示させるために利用しているSPARQListです。
