@@ -22,18 +22,20 @@ PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 SELECT DISTINCT ?dna STR(?label) AS ?gene_label ?hp STR(?id)AS ?gene_id ?ncbi_gene ?gene ?nando
-WHERE{
+WHERE {
   VALUES ?nando { nando:{{nando_id}} }
-  graph <http://metadb.riken.jp/db/dna_diseaseID>{
-    ?dna <http://purl.obolibrary.org/obo/RO_0003301> ?nando.}
-  graph <http://metadb.riken.jp/db/xsearch_dnabank_brso>{
+  GRAPH <http://metadb.riken.jp/db/dna_diseaseID> {
+    ?dna <http://purl.obolibrary.org/obo/RO_0003301> ?nando.
+  }
+  GRAPH <http://metadb.riken.jp/db/xsearch_dnabank_brso> {
     ?dna rdfs:label ?label;
          foaf:homepage ?hp;
          dct:identifier ?id;
          brso:genomic_feature ?B.
     ?B   brso:has_genomic_segment ?B1.
     ?B1  rdfs:seeAlso ?ncbi_gene;
-         skos:altLabel ?gene.}
+         skos:altLabel ?gene.
+  }
   FILTER(STRSTARTS(STR(?ncbi_gene), "http://identifiers.org/ncbigene/"))
 }
 

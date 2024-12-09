@@ -6,7 +6,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://nanbyodata.jp/sparql
 
 ## `result` 
 ```sparql
@@ -21,19 +21,17 @@ prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix dc: <http://purl.org/dc/elements/1.1/>
 prefix nando: <http://nanbyodata.jp/ontology/NANDO_>
 prefix sio: <http://semanticscience.org/resource/>
+
 SELECT DISTINCT ?nando ?label ?label_en ?year ?num_of_patients
-
-
 WHERE {
-  GRAPH<https://pubcasefinder.dbcls.jp/rdf/nanbyodata> {
-     nando:{{nando_id}} sio:SIO_000216 ?B1 .
+  GRAPH <https://nanbyodata.jp/rdf/nanbyodata> {
+    nando:{{nando_id}} sio:SIO_000216 ?B1 .
     ?B1 nando:has_aYearOfStatistics ?B2.
     ?B2 sio:SIO_000300 ?year.
     ?B1 nando:has_theNumberOfPatients ?B3.
     ?B3 sio:SIO_000300 ?num_of_patients.
-    }
-    }
-    ORDER BY ?year
+  }
+} ORDER BY ?year
 
 ```
  Output

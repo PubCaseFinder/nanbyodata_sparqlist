@@ -2,7 +2,7 @@
 
 ## Endpoint
 
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://nanbyodata.jp/sparql
 
 ## `result` 
 ```sparql
@@ -14,22 +14,24 @@ PREFIX sio: <http://semanticscience.org/resource/>
 
 SELECT DISTINCT ?s ?year ?num_of_patients  ?nando ?label ?label_en ?number
 WHERE{
-graph<https://pubcasefinder.dbcls.jp/rdf/nanbyodata>{
-  ?s sio:SIO_000216 ?year_data .
-  ?year_data  nando:has_aYearOfStatistics/sio:SIO_000300 ?year .
-  ?year_data nando:has_theNumberOfPatients/sio:SIO_000300 ?num_of_patients.}
+  GRAPH <https://nanbyodata.jp/rdf/nanbyodata> {
+    ?s sio:SIO_000216 ?year_data .
+    ?year_data  nando:has_aYearOfStatistics/sio:SIO_000300 ?year .
+    ?year_data nando:has_theNumberOfPatients/sio:SIO_000300 ?num_of_patients.
+  }
 
-graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
-   ?s dcterms:identifier ?nando.
-     BIND (SUBSTR(?nando, 7, 1) AS ?nando1)
-     FILTER REGEX(?nando1,"1")
-   ?s rdfs:label ?label .
+  GRAPH <https://nanbyodata.jp/rdf/ontology/nando> {
+    ?s dcterms:identifier ?nando.
+    BIND (SUBSTR(?nando, 7, 1) AS ?nando1)
+    FILTER REGEX(?nando1,"1")
+    ?s rdfs:label ?label .
     FILTER (lang(?label) = "ja") .
-    OPTIONAL {    ?s rdfs:label ?label_en .
-                FILTER (lang(?label_en) = "en")
+    OPTIONAL {
+      ?s rdfs:label ?label_en .
+      FILTER (lang(?label_en) = "en")
     }
     OPTIONAL {?s nando:hasNotificationNumber ?number.}
-}
+  }
 } ORDER BY ?nando ?year
 
 ```
@@ -73,9 +75,11 @@ graph<https://pubcasefinder.dbcls.jp/rdf/ontology/nando> {
 
 ```
 ## Description
-- 2024/10/21　ラベルの変更（小児慢性と区別をつけるため）
+- 2024/10/21 タイトル変更
 - 2024/03/21 タイトルを変更しました。旧："nanbyoData_the_number_of_patients_list"
 - 2024/03/13 タイトルを修正して新規に作成、患者数のデータを2021年、2022年を追加しました。
 - NanbyoDataで希少難病疾患の患者数を表示させるために利用しているSPARQListです。
 - RDFのデータは高月の方で作成し、PubcaseFinderのエンドポイントにデータはあります。
 - 編集：高月（2024/01/12)
+
+

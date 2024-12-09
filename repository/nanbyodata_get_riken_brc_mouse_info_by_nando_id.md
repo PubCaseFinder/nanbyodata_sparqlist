@@ -21,18 +21,19 @@ PREFIX brso: <http://purl.jp/bio/10/brso/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 
-select ?mouse STR(?name) AS ?mouse_name ?hp STR(?id) AS ?mouse_id ?description ?nando
-where{
+SELECT ?mouse STR(?name) AS ?mouse_name ?hp STR(?id) AS ?mouse_id ?description ?nando
+WHERE {
   VALUES ?nando { nando:{{nando_id}} }
-  graph <http://metadb.riken.jp/db/mouse_diseaseID>{
-    ?mouse <http://purl.obolibrary.org/obo/RO_0003301> ?nando.}
-  graph <http://metadb.riken.jp/db/xsearch_animal_brso>{
+  GRAPH <http://metadb.riken.jp/db/mouse_diseaseID> {
+    ?mouse <http://purl.obolibrary.org/obo/RO_0003301> ?nando.
+  }
+  GRAPH <http://metadb.riken.jp/db/xsearch_animal_brso> {
     ?mouse rdfs:label ?name;
            foaf:homepage ?hp;
            dct:identifier ?id.
-      OPTIONAL {?mouse dc:description ?description.}
-      FILTER (lang(?description) = "ja")
-      }
+    OPTIONAL {?mouse dc:description ?description.}
+    FILTER (lang(?description) = "ja")
+  }
 }
 
 ```

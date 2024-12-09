@@ -6,7 +6,7 @@
 
 ## Endpoint
 
-https://pubcasefinder-rdf.dbcls.jp/sparql
+https://nanbyodata.jp/sparql
 
 ## `result`
 ```sparql
@@ -20,32 +20,28 @@ PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
 SELECT ?nando ?mondo ?mondo_id ?mondo_label_ja ?mondo_label_en ?exactMatch_disease ?property
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
 
   OPTIONAL {
-    {
-      ?nando skos:closeMatch ?mondo .
-    }
-    UNION
-    {
-      ?nando skos:exactMatch ?mondo .
-    }
-    ?nando ?property ?mondo.
+    ?nando skos:exactMatch | skos:closeMatch ?mondo ;
+           ?property ?mondo .
     ?mondo oboInOwl:id ?mondo_id ;
            skos:exactMatch ?exactMatch_disease .
 
     # 日本語ラベルの取得
     OPTIONAL {
-      ?nando skos:closeMatch|skos:exactMatch ?mondo .
+      ?nando skos:closeMatch | skos:exactMatch ?mondo .
       ?mondo rdfs:label ?mondo_label_ja .
       FILTER (lang(?mondo_label_ja) = "ja")
     }
 
     # 英語ラベルの取得、または言語タグがない場合
     OPTIONAL {
-      ?nando skos:closeMatch|skos:exactMatch ?mondo .
+      ?nando skos:closeMatch | skos:exactMatch ?mondo .
       ?mondo rdfs:label ?mondo_label_en .
       FILTER (lang(?mondo_label_en) = "en" || lang(?mondo_label_en) = "")
     }
@@ -145,7 +141,6 @@ WHERE {
 
   return tree;
 };
-
 
 
 
