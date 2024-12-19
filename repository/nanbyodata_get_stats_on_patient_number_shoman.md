@@ -59,11 +59,11 @@ WHERE{
     // 以下は新しい nando_id が出てきた最初の行の処理(まだ nando_id のデータが tree にない)
     // 各年の患者数を null にしたオブジェクトを作成
     let newData = {
-      s: d.s ? d.s.value : null,
+      s: d.s ? d.s.value : "-",
       nando,
-      label: d.label ? d.label.value : null,
-      label_en: d.label_en ? d.label_en.value : null,
-      number: d.number && d.number.value ? Number(d.number.value) : null,
+      label: d.label ? d.label.value : "-",
+      label_en: d.label_en ? d.label_en.value : "-",
+      number: d.number && d.number.value ? Number(d.number.value) : "-",
       num_of_2015: null,
       num_of_2016: null,
       num_of_2017: null,

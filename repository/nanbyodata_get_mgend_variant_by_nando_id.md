@@ -3,7 +3,7 @@
 ## Parameters
 
 * `nando_id` NANDO ID
-  * default: 1200010
+  * default: 1200216
   * examples: 1200016,1200462
   
 ## Endpoint
@@ -37,6 +37,7 @@ WHERE {
   GRAPH <https://nanbyodata.jp/rdf/ontology/mondo> {
     ?mondo rdfs:label ?mondolabel; 
     oboInOwl:hasDbXref ?dbxref.
+    FILTER (lang(?mondolabel) = "") 
     FILTER contains(?dbxref,'OMIMPS')
     BIND(REPLACE(?dbxref,'OMIMPS:','https://omim.org/phenotypicSeries/PS') AS ?omimps)
     BIND(IRI(?omimps)AS ?omimuri)
