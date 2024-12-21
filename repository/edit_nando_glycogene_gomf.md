@@ -1,4 +1,4 @@
-# 修正中：MetaStanza用にNANDOから糖鎖のデータを取得+GlyCosmos gene data　＆　GO Molecular functionの表示
+# MetaStanza用：NANDOから糖鎖のデータを取得+GlyCosmos gene data　＆　GO Molecular function、PMIDの表示
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200093
@@ -141,10 +141,10 @@ PREFIX up: <http://purl.uniprot.org/core/>
 PREFIX go: <http://www.geneontology.org/formats/oboInOwl#>
 
 
-SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf #?evi_url ?evidence ?pmid_id ?pmid#?go_id ?evi_url ?evi_code
+SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf 
 #(GROUP_CONCAT(DISTINCT ?evidence ; separator = "|") AS ?evidences) 
-#(GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
-(GROUP_CONCAT(DISTINCT IRI(?pmid_uri) ; SEPARATOR = ",") AS ?pmid_uris)
+(GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
+#(GROUP_CONCAT(DISTINCT IRI(?pmid_uri) ; SEPARATOR = ",") AS ?pmid_uris)
 FROM<http://rdf.glycosmos.org/glycogenes> #FROM1
 FROM <http://purl.obolibrary.org/obo/go.owl> #FROM2
 FROM <http://purl.obolibrary.org/obo/eco.owl> #FROM3
@@ -170,7 +170,7 @@ WHERE{
       ?eco go:hasExactSynonym ?evi_label .
       ?eco go:id ?evi_code .
       BIND(IRI(CONCAT("https://evidenceontology.org/term/",?evi_code)) AS ?evi_url)
-      FILTER(REGEX(?evi_label,"^[A-Z]{3}$"))
+      #FILTER(REGEX(?evi_label,"^[A-Z]{3}$"))
     }
   BIND((CONCAT(?evi_label, ":", ?evi_code)) AS ?evidence) #evidenceがOPTIONALで取得できないためこの行に記述
   BIND(REPLACE(STR(?pmid_uri), "http://identifiers.org/pubmed/", "") AS ?pmid_id)
@@ -178,7 +178,8 @@ WHERE{
   
 }
 #GROUP BY ?glycogene_id
-ORDER BY DESC (?glycogene_id)
+ORDER BY DESC (?glycogene_id) ?go_term_mf
+
 ```
 
 ## Output
@@ -192,10 +193,11 @@ ORDER BY DESC (?glycogene_id)
       let pmid_array = [];
       let pmid_arrays = [];
       let pmiduri_array = [];
+      let pmid_link = "";
       
       //glycosmos geneのリンク
       let glycogene = row.gene_idStr.value;
-      let glycogene_url = "https://glycosmos.org/genes/" + glycogene;
+      let glycogene_url = "https://glycosmos.org/genes/" + glycogene +"#GeneOntology(GO)";
       
       // エビデンスが存在するかをチェック
       //if (row.evidences?.value) {
@@ -222,21 +224,11 @@ ORDER BY DESC (?glycogene_id)
      // });
       
       //PMIDが存在するかをチェック
-      //if(row.pmid_ids.value){
-      //  pmid_array = row.pmid_ids.value.split(',');
-      //}
-      ////PMID URIが存在するかをチェック
-      ////if(row.pmid_uris.value){
-      ////  pmiduri_array = row.pmid_uris.value.split(',');
-      ////}
-      //PMID配列を処理
-      //pmid_array.forEach((pmid_id) => {
-      //  let pmid_uri = pmid_id ? "http://identifiers.org/pubmed/" + pmid_id : "";
-      //  pmid_arrays.push({
-      //    "id": pmid_id,
-      //    "uri": pmid_uri
-      //  });
-     // });
+      if(row.pmid_ids.value){
+        //pmid_array = row.pmid_ids.value.split(',');
+        let pubmed_ids = row.pmid_ids.value;
+        pmid_link = "https://pubmed.ncbi.nlm.nih.gov/?term=" + pubmed_ids;
+      }
 
       // 各プロパティの存在をチェックし、デフォルト値を設定
       return {
@@ -247,9 +239,9 @@ ORDER BY DESC (?glycogene_id)
         "go": row.go?.value || "",
         //"evidence":row.evidence?.value || "",
         //"evidence_url":row.evi_url?.value || "",
-        "pmid_uri" :row.pmid_uris?.value || ""
-        //"evidence_code": evi_arrays,
-        //"pmid": pmid_arrays
+        //"pmid_id":row.pmid_id?.value || "",
+        "pmid_ids":row.pmid_ids?.value || "",
+  		  "pmid_link":pmid_link
       };
     });
   }
