@@ -194,6 +194,7 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
       let pmid_arrays = [];
       let pmiduri_array = [];
       let pmid_link = "";
+      let pubmed_ofNum = "";
       
       //glycosmos geneのリンク
       let glycogene = row.gene_idStr.value;
@@ -228,6 +229,8 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
         //pmid_array = row.pmid_ids.value.split(',');
         let pubmed_ids = row.pmid_ids.value;
         pmid_link = "https://pubmed.ncbi.nlm.nih.gov/?term=" + pubmed_ids;
+        pmid_array = pubmed_ids.split(',');
+        pubmed_ofNum = pmid_array.length
       }
 
       // 各プロパティの存在をチェックし、デフォルト値を設定
@@ -241,6 +244,7 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
         //"evidence_url":row.evi_url?.value || "",
         //"pmid_id":row.pmid_id?.value || "",
         "pmid_ids":row.pmid_ids?.value || "",
+        "pmid_num":pubmed_ofNum,
   		  "pmid_link":pmid_link
       };
     });
