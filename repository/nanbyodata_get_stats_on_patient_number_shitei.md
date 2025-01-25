@@ -63,7 +63,8 @@ WHERE{
       num_of_2019: null,
       num_of_2020: null,
       num_of_2021: null,
-      num_of_2022: null
+      num_of_2022: null,
+      num_of_2023: null
     };
     // この行に含まれる年の患者数を更新
     newData[`num_of_${d.year.value}`] = Number(d.num_of_patients.value) || null
@@ -75,6 +76,7 @@ WHERE{
 
 ```
 ## Description
+- 2025/01/23 2023年度データを追加し、Javascript部分に2023年度を追記
 - 2024/10/21 タイトル変更
 - 2024/03/21 タイトルを変更しました。旧："nanbyoData_the_number_of_patients_list"
 - 2024/03/13 タイトルを修正して新規に作成、患者数のデータを2021年、2022年を追加しました。

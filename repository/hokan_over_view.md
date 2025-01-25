@@ -218,19 +218,19 @@ WHERE {
     let inheritance_uris = [];
     
     for (let i = 0; i < rows.length ;i++) {
-      if (rows[i].nando_id && rows[i].nando_id.value) {
+      if (rows[i].nando_id) {
         data.nando_id = rows[i].nando_id.value;
       };
-      if (rows[i].label_en && rows[i].label_en.value) {
+      if (rows[i].label_en) {
         data.label_en = rows[i].label_en.value;
       };
-      if (rows[i].label_ja && rows[i].label_ja.value) {   
+      if (rows[i].label_ja) {   
         data.label_ja = rows[i].label_ja.value;
       };
-      if (rows[i].label_hira && rows[i].label_hira.value) {
+      if (rows[i].label_hira) {
         data.ruby = rows[i].label_hira.value;
       };
-      if (rows[i].alt_label_en && rows[i].alt_label_en.value) {
+      if (rows[i].alt_label_en) {
         if (data.alt_label_en) {
           if (!data.alt_label_en.includes(rows[i].alt_label_en.value)) {
             data.alt_label_en.push(rows[i].alt_label_en.value);
@@ -241,7 +241,7 @@ WHERE {
           data.alt_label_en.sort((a, b) => a.localeCompare(b));
         }
       };
-      if (rows[i].alt_label_ja && rows[i].alt_label_ja.value) {
+      if (rows[i].alt_label_ja) {
         if (data.alt_label_ja) {
           if (!data.alt_label_ja.includes(rows[i].alt_label_ja.value)) {
             data.alt_label_ja.push(rows[i].alt_label_ja.value);
@@ -255,13 +255,13 @@ WHERE {
       if (rows[i].notification_number) {
         data.notification_number = rows[i].notification_number.value;
       };
-      if (rows[i].description && rows[i].description.value) {
+      if (rows[i].description) {
         data.description = rows[i].description.value;
       };
-      if (rows[i].source && rows[i].source.value ) {
+      if (rows[i].source) {
         data.source = rows[i].source.value;
       };
-      if (rows[i].site && rows[i].site.value) {
+      if (rows[i].site) {
         switch (true) {
           case /entry/.test(rows[i].site.value):
             data.nanbyou = {id: rows[i].site.value.split("/").slice(-1)[0],
@@ -289,7 +289,7 @@ WHERE {
             break;
         }
       }
-      if (rows[i].mondo && rows[i].mondo.value) {
+      if (rows[i].mondo) {
         if (data.mondos) {
           if (!mondo_ids.includes(rows[i].mondo_id.value)) {
            data.mondos.push({url: rows[i].mondo_id.value.replace("MONDO:", "https://monarchinitiative.org/MONDO:"), id: rows[i].mondo_id.value});
@@ -300,7 +300,7 @@ WHERE {
           data.mondos.push({url: rows[i].mondo_id.value.replace("MONDO:", "https://monarchinitiative.org/MONDO:"), id: rows[i].mondo_id.value});
           mondo_ids.push(rows[i].mondo_id.value);
         }
-        if (rows[i].db_xref && rows[i].db_xref.value) {
+        if (rows[i].db_xref) {
           db_xref_uri = rows[i].db_xref.value ;
           if (data.db_xrefs) {
             if (db_xref_uri.match(/Orphanet_/)) {
@@ -340,7 +340,7 @@ WHERE {
     
     let medgen_data = [];
     
-    if (medgen_rows && medgen_rows.length  > 0) {
+    if (medgen_rows.length > 0) {
       for (let i = 0; i < medgen_rows.length; i++ ) {
         medgen_data.push({medgen: medgen_rows[i].medgen.value});
         medgen_data[i].medgen_id = medgen_rows[i].medgen.value.split("/").slice(-1)[0];
@@ -375,7 +375,7 @@ WHERE {
       data.medgen_definition = medgen_data[0].definition;
     }
 
-    if (inheritance_rows && inheritance_rows.length > 0) {
+    if (inheritance_rows.length > 0) {
       for (let i = 0; i < inheritance_rows.length; i++ ) {
         inheritance_uri = inheritance_rows[i].inheritance.value
         inheritance_ja = inheritance_rows[i].inheritance_ja.value
