@@ -1,4 +1,4 @@
-# MetaStanza用：NANDOから糖鎖のデータを取得+GlyCosmos gene data　＆　GO Molecular function、PMIDの表示
+# Retrieve Glycan-related Gene informations in GlyCosmos  by the given NANDO ID
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200093
