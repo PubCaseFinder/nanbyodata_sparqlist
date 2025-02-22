@@ -200,6 +200,9 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
       let glycogene = row.gene_idStr.value;
       let glycogene_url = "https://glycosmos.org/genes/" + glycogene +"#GeneOntology(GO)";
       
+      //NCBIのリンク
+      let ncbi_url = "http://identifiers.org/ncbigene/" + glycogene;
+      
       // エビデンスが存在するかをチェック
       //if (row.evidences?.value) {
       //  evi_array = row.evidences.value.split('|');
@@ -238,6 +241,7 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
         "glycosmosgene": glycogene_url,
         "gene_id": row.gene_idStr?.value || "",
         "ncbigene_description": row.description?.value || "",
+        "ncbi_url": ncbi_url,
         "go_term_mf": row.go_term_mf?.value || "",
         "go": row.go?.value || "",
         //"evidence":row.evidence?.value || "",
