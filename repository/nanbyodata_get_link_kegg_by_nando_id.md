@@ -18,27 +18,27 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT ?nando ?mondo ?mondo_id ?mondo_label_ja ?mondo_label_en ?property
+SELECT ?nando ?kegg ?kegg_id ?kegg_label_ja ?kegg_label_en ?property
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
-FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+FROM <https://nanbyodata.jp/rdf/nanbyodata>
 WHERE {
   ?nando a owl:Class ;
          dcterms:identifier "NANDO:{{nando_id}}" .
 OPTIONAL {
-  ?nando skos:exactMatch | skos:closeMatch ?mondo ;
-         ?property ?mondo.
-  ?mondo oboInOwl:id ?mondo_id.
+  ?nando oboInOwl:hasDbXref ?kegg ;
+         ?property ?kegg.
+  ?kegg dc:identifier ?kegg_id.
 
   # 日本語ラベルの取得
   OPTIONAL {
-    ?mondo rdfs:label ?mondo_label_ja .
-    FILTER (lang(?mondo_label_ja) = "ja")
+    ?kegg rdfs:label ?kegg_label_ja .
+    FILTER (lang(?kegg_label_ja) = "ja")
   }
 
   # 英語ラベルの取得、または言語タグがない場合
   OPTIONAL {
-    ?mondo rdfs:label ?mondo_label_en .
-    FILTER (lang(?mondo_label_en) = "en" || lang(?mondo_label_en) = "")}
+    ?kegg rdfs:label ?kegg_label_en .
+    FILTER (lang(?kegg_label_en) = "en" || lang(?kegg_label_en) = "")}
   }
 }
 
@@ -52,10 +52,10 @@ OPTIONAL {
 
   if (result && result.results && result.results.bindings) {
     result.results.bindings.forEach(d => {
-      let mondo_id = d.mondo_id ? d.mondo_id.value : null;
+      let kegg_id = d.kegg_id ? d.kegg_id.value : null;
 
       // mondo_id が存在しない場合、JSON生成をスキップ
-      if (mondo_id) {
+      if (kegg_id) {
         let nando = d.nando ? d.nando.value.replace("http://nanbyodata.jp/ontology/NANDO_", "NANDO:") : null;
 
         let nandoNode = {
@@ -74,17 +74,17 @@ OPTIONAL {
           tree.push(nandoNode);
         }
 
-        let mondoNode = {
+        let keggNode = {
           parent: nando, // nando の子として配置
-          id: mondo_id, // 子ノード (mondo_id)
-          displayid: mondo_id,
+          id: kegg_id, // 子ノード (mondo_id)
+          displayid: kegg_id,
           property: d.property ? d.property.value : null,
-          mondo_label_ja: d.mondo_label_ja ? d.mondo_label_ja.value : null,
-          mondo_label_en: d.mondo_label_en ? d.mondo_label_en.value : null,
-          mondo_url: mondo_id.replace("MONDO:", "https://monarchinitiative.org/MONDO:"),
+          kegg_label_ja: d.kegg_label_ja ? d.kegg_label_ja.value : null,
+          kegg_label_en: d.kegg_label_en ? d.kegg_label_en.value : null,
+          kegg_url: d.kegg ? d.kegg.value : null 
         };
 
-        tree.push(mondoNode);
+        tree.push(keggNode);
       }
     });
   }
@@ -95,4 +95,4 @@ OPTIONAL {
 
 ```
 ## Description
-- NanbyoDataでMONDOIDを表示させるためのSPARQListです。2024/11/19 高月
+- NanbyoDataでKEGGIDを表示させるためのSPARQListです。2025/02/28 高月

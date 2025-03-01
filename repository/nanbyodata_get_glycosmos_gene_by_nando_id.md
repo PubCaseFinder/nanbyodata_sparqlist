@@ -4,10 +4,11 @@
   * default: 2200093
   * examples: 1200431、1200147
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
+
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 ```sparql
-PREFIX : <http://nanbyodata.jp/ontology/nando#>
+PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -51,7 +52,7 @@ WHERE {
 })
 ```
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `gene` retrieve genes associated with the mondo uri
 ```sparql
