@@ -4,10 +4,11 @@
   * default: 2200093
   * examples: 1200431、1200147
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://nanbyodata.jp/sparql
+
 ## `nando2mondo` get mondo_id correspoinding to nando_id
 ```sparql
-PREFIX : <http://nanbyodata.jp/ontology/nando#>
+PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -51,7 +52,7 @@ WHERE {
 })
 ```
 ## Endpoint
-https://dev-pubcasefinder.dbcls.jp/sparql/
+https://nanbyodata.jp/sparql
 
 ## `gene` retrieve genes associated with the mondo uri
 ```sparql
@@ -200,6 +201,9 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
       let glycogene = row.gene_idStr.value;
       let glycogene_url = "https://glycosmos.org/genes/" + glycogene +"#GeneOntology(GO)";
       
+      //NCBIのリンク
+      let ncbi_url = "http://identifiers.org/ncbigene/" + glycogene;
+      
       // エビデンスが存在するかをチェック
       //if (row.evidences?.value) {
       //  evi_array = row.evidences.value.split('|');
@@ -238,6 +242,7 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
         "glycosmosgene": glycogene_url,
         "gene_id": row.gene_idStr?.value || "",
         "ncbigene_description": row.description?.value || "",
+        "ncbi_url": ncbi_url,
         "go_term_mf": row.go_term_mf?.value || "",
         "go": row.go?.value || "",
         //"evidence":row.evidence?.value || "",
