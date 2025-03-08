@@ -216,3 +216,66 @@ WHERE {
 ?sub rdfs:subClassOf+ nando:2000001 .
 ?sub dcterms:description ?desc .
 }
+
+```
+## Endpoint
+https://dev-nanbyodata.dbcls.jp/sparql
+
+## 指定難病の最大値を計算する
+```sparql
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+PREFIX medgen: <http://med2rdf/ontology/medgen#>
+PREFIX sio: <http://semanticscience.org/resource/>
+PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX nando: <http://nanbyodata.jp/ontology/>
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX nando: <http://nanbyodata.jp/ontology/>
+
+SELECT ?child ?grandchild (COUNT(?descendant) AS ?numDescendants)
+WHERE {
+  ?child rdfs:subClassOf nando:NANDO_1000001 .
+  ?grandchild rdfs:subClassOf ?child .
+  
+  # ?descendant は ?grandchild のすべての子孫を取得
+  OPTIONAL {
+    ?descendant rdfs:subClassOf+ ?grandchild .
+  }
+}
+GROUP BY ?child ?grandchild
+ORDER BY ?child DESC(?numDescendants)
+
+```
+## Endpoint
+https://dev-nanbyodata.dbcls.jp/sparql
+
+## 小満の最大値を計算する
+```sparql
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+PREFIX medgen: <http://med2rdf/ontology/medgen#>
+PREFIX sio: <http://semanticscience.org/resource/>
+PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX nando: <http://nanbyodata.jp/ontology/>
+
+
+SELECT ?greatGrandchild (COUNT(?descendant) AS ?numDescendants)
+WHERE {
+  ?child rdfs:subClassOf nando:NANDO_2000001 .
+  ?grandchild rdfs:subClassOf ?child .
+  ?greatGrandchild rdfs:subClassOf ?grandchild .
+
+  # ?descendant は ?greatGrandchild のすべての子孫を取得
+  OPTIONAL {
+    ?descendant rdfs:subClassOf+ ?greatGrandchild .
+  }
+}
+GROUP BY ?greatGrandchild
+ORDER BY DESC(?numDescendants)

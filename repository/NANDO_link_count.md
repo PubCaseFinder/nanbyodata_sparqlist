@@ -14,11 +14,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)
+SELECT count(distinct ?sub) count(distinct ?o) as ?mondo
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?sub rdfs:subClassOf+ nando:2000001 .
   ?sub skos:exactMatch ?o.
+  FILTER (CONTAINS(STR(?o), "MONDO"))
 }
 
 ```
@@ -36,7 +37,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)
+SELECT count(distinct ?sub) count(distinct ?o) as ?mondo
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?sub rdfs:subClassOf+ nando:1000001 .
@@ -59,7 +60,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)
+SELECT count(distinct ?sub) count(distinct ?o) as ?mondo
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?sub rdfs:subClassOf+ nando:2000001 .
@@ -82,7 +83,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)
+SELECT count(distinct ?sub)  count(distinct ?o) as ?mondo
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?sub rdfs:subClassOf+ nando:1000001 .
@@ -105,12 +106,11 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)
+SELECT count(distinct ?sub) count(distinct ?o) as ?kegg
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?sub rdfs:subClassOf+ nando:1000001 .
   ?sub oboInOwl:hasDbXref ?o.
-  FILTER (CONTAINS(STR(?o), "MONDO"))
 }
 ```
 ## Endpoint
@@ -127,7 +127,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)
+SELECT count(distinct ?sub) as ?nando count(distinct ?o) as ?kegg
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 WHERE {
   ?sub rdfs:subClassOf+ nando:2000001 .
@@ -148,7 +148,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)as ?a count(distinct ?mondo) as ?b
+SELECT count(distinct ?sub)as ?nando count(distinct ?mondo) as ?mondo
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 WHERE {
@@ -164,7 +164,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman omim count
+## shitei omim count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -175,7 +175,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
-SELECT count(distinct ?sub)as ?a count(distinct ?mondo) as ?b
+SELECT count(distinct ?sub)as ?nando count(distinct ?mondo) as ?mondo
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 WHERE {
@@ -205,7 +205,7 @@ PREFIX mo: <http://med2rdf/ontology/medgen#>
 PREFIX nci: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
 PREFIX dct: <http://purl.org/dc/terms/>
 
-SELECT DISTINCT count(distinct ?sub)as ?a count(distinct ?medgen) as ?b
+SELECT DISTINCT count(distinct ?sub)as ?nando count(distinct ?medgen) as ?medgen
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/medgen>
@@ -238,7 +238,7 @@ PREFIX mo: <http://med2rdf/ontology/medgen#>
 PREFIX nci: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
 PREFIX dct: <http://purl.org/dc/terms/>
 
-SELECT DISTINCT count(distinct ?sub)as ?a count(distinct ?medgen) as ?b
+SELECT DISTINCT count(distinct ?sub)as ?nando count(distinct ?medgen) as ?medgen
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/medgen>

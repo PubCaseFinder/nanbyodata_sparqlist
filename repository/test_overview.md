@@ -104,13 +104,15 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX mondo: <http://purl.obolibrary.org/obo/>
 PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
-PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
+PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 
 SELECT distinct ?inheritance ?inheritance_ja ?inheritance_en
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/pcf>
+FROM <https://nanbyodata.jp/rdf/ontology/hp>
+
 WHERE{
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
