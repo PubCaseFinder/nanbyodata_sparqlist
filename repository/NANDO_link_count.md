@@ -254,3 +254,54 @@ WHERE {
   ?medgen rdfs:seeAlso ?concept .        
 }
 ```
+## shoman ordo count
+```sparql
+PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+
+SELECT count(distinct ?sub)as ?nando count(distinct ?mondo) as ?mondo
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+WHERE {
+       ?sub rdfs:subClassOf+ nando:2000001 .
+       ?sub skos:exactMatch | skos:closeMatch ?mondo .
+       FILTER (CONTAINS(STR(?mondo), "MONDO"))
+    
+       ?mondo oboInOwl:id ?mondo_id ;
+           skos:exactMatch ?exactMatch_disease .
+    FILTER (CONTAINS(STR(?exactMatch_disease), "Orphanet"))
+   }
+```
+## Endpoint
+https://dev-nanbyodata.dbcls.jp/sparql
+
+## shitei ordo count
+```sparql
+PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+
+SELECT count(distinct ?sub)as ?nando count(distinct ?mondo) as ?mondo
+FROM <https://nanbyodata.jp/rdf/ontology/nando>
+FROM <https://nanbyodata.jp/rdf/ontology/mondo>
+WHERE {
+       ?sub rdfs:subClassOf+ nando:1000001 .
+       ?sub skos:exactMatch | skos:closeMatch ?mondo .
+       FILTER (CONTAINS(STR(?mondo), "MONDO"))
+    
+       ?mondo oboInOwl:id ?mondo_id ;
+           skos:exactMatch ?exactMatch_disease .
+    FILTER (CONTAINS(STR(?exactMatch_disease), "Orphanet"))
+   }
+```
