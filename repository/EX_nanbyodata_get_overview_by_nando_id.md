@@ -3,7 +3,7 @@
 ## Parameters
 
 * `nando_id` NANDO ID
-  * default: 1200473
+  * default: 1200005
   * examples: 1200009, 2200865
 
 ## Endpoint
@@ -104,15 +104,15 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sio: <http://semanticscience.org/resource/>
 PREFIX mondo: <http://purl.obolibrary.org/obo/>
 PREFIX ncit: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>
-PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
+PREFIX : <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
+PREFIX nando: <http://nanbyodata.jp/ontology/nando#>
 
 SELECT distinct ?inheritance ?inheritance_ja ?inheritance_en
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/pcf>
 FROM <https://nanbyodata.jp/rdf/ontology/hp>
-
 WHERE{
   {{#if mondo_uri_list}}
 	VALUES ?mondo_uri { {{mondo_uri_list}} }
@@ -120,16 +120,15 @@ WHERE{
 
   ?disease rdfs:seeAlso ?mondo_uri ;
            nando:hasInheritance ?inheritance .
-  OPTIONAL {
-    ?inheritance rdfs:label ?inheritance_ja .
-    FILTER (lang(?inheritance_ja) = "ja")
-  }
-  #optional { ?inheritance rdfs:label ?inheritance_en . FILTER (lang(?inheritance_en) = "en") }
-  OPTIONAL {
+  GRAPH <https://nanbyodata.jp/rdf/ontology/hp>{
     ?inheritance rdfs:label ?inheritance_en .
     FILTER (lang(?inheritance_en) = "")
+  OPTIONAL {
+    ?inheritance rdfs:label ?inheritance_ja .
+    FILTER (lang(?inheritance_ja) = "ja")}
   }
 }
+
 ORDER BY ?inheritance
 ```
 
@@ -149,13 +148,12 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 PREFIX mondo: <http://purl.obolibrary.org/obo/mondo#>
+PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 
 SELECT DISTINCT ?nando ?nando_id ?label_ja ?label_hira ?label_en ?alt_label_ja ?alt_label_en ?notification_number 
-                ?source ?description ?mondo ?mondo_id ?mondo_description ?site ?db_xref ?altLabel ?kegg_description
+                ?source ?description ?mondo ?mondo_id ?mondo_description ?site ?db_xref ?altLabel
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
-FROM <https://nanbyodata.jp/rdf/ontology/ordo>
-FROM <https://nanbyodata.jp/rdf/nanbyodata>
 WHERE {
   ?nando a owl:Class ;
     dcterms:identifier "NANDO:{{nando_id}}" .
@@ -198,67 +196,26 @@ WHERE {
   OPTIONAL {
     ?nando rdfs:seeAlso ?site
   }
-  OPTIONAL {
-    ?nando oboInOwl:hasDbXref ?kegg .
-    ?kegg dc:description ?kegg_description .
-           }
   BIND({{nando_id}} AS ?nando_id)
-}
-```
-## Endpoint
-
-https://dev-nanbyodata.dbcls.jp/sparql
-
-## `ordo_desc` retrieve a orphanet description
-
-```sparql
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX obo: <http://purl.obolibrary.org/obo/>
-PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
-PREFIX mondo: <http://purl.obolibrary.org/obo/mondo#>
-PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
-PREFIX efo: <http://www.ebi.ac.uk/efo/>
-
-SELECT DISTINCT ?nando ?mondo ?exactMatch_disease as ?ordo ?desc
-FROM <https://nanbyodata.jp/rdf/ontology/nando>
-FROM <https://nanbyodata.jp/rdf/ontology/mondo>
-FROM <https://nanbyodata.jp/rdf/ontology/ordo>
-
-WHERE {
-  ?nando a owl:Class ;
-         dcterms:identifier "NANDO:{{nando_id}}" .
-  
-  OPTIONAL {
-    ?nando skos:exactMatch | skos:closeMatch ?mondo ;
-           ?property ?mondo .
-    ?mondo oboInOwl:id ?mondo_id .
-    ?mondo skos:exactMatch ?exactMatch_disease.
-  }
-   FILTER (CONTAINS(STR(?exactMatch_disease), "http://www.orpha.net/ORDO/Orphanet_")).
-  OPTIONAL {
-    ?exactMatch_disease efo:definition ?desc.
-  }
 }
 ```
 
 ## Output
+
 ```javascript
 ({
-  json({result, medgen, inheritance, ordo_desc}) {
+  json({result, medgen, inheritance}) {
     let rows = result.results.bindings;
     let medgen_rows = medgen.results.bindings;
     let inheritance_rows = inheritance.results.bindings;
-    let ordo_desc_rows = ordo_desc.results.bindings;
     let data = {};
     let mondo_ids = [];
+    let db_xrefs = [];
     let mondo_decs = [];
- 　 let inheritance_uris = [];
-    let ordo_dif = [];
-    
+    let orpha_ids = [];
+    let omim_ids = [];
+    let gene_uris = [];
+    let inheritance_uris = [];
 
     for (let i = 0; i < rows.length; i++) {
       // 安全に nando_id を読み取る
@@ -311,11 +268,6 @@ WHERE {
         data.description = rows[i].description.value;
       }
 
-      // kegg description
-      if (rows[i].kegg_description && rows[i].kegg_description.value) {
-        data.kegg_description = rows[i].kegg_description.value;
-      }
-      
       // source
       if (rows[i].source && rows[i].source.value) {
         data.source = rows[i].source.value;
@@ -348,10 +300,28 @@ WHERE {
               url: rows[i].site.value
             };
             break;
+          case /kegg/.test(rows[i].site.value):
+            data.kegg = {
+              id: rows[i].site.value
+                .split("/")
+                .slice(-1)[0]
+                .replace('www_bget?ds_ja:', ''),
+              url: rows[i].site.value
+            };
+            break;
+          case /UR-DBMS/.test(rows[i].site.value):
+            data.urdbms = {
+              id: rows[i].site.value
+                .split("/")
+                .slice(-1)[0]
+                .replace('SyndromeDetail.php?winid=1&recid=', ''),
+              url: rows[i].site.value
+            };
+            break;
         }
       }
 
- // mondo / mondo_id / mondo_description
+      // mondo / mondo_id / mondo_description / db_xref
       // ここは rows[i].mondo があっても mondo_id や mondo_description が無いことがあるので
       // 個別に null チェックをする
       if (rows[i].mondo && rows[i].mondo.value) {
@@ -382,7 +352,56 @@ WHERE {
           }
         }
 
-       
+        // db_xref
+        if (rows[i].db_xref && rows[i].db_xref.value) {
+          let db_xref_uri = rows[i].db_xref.value;
+          if (data.db_xrefs) {
+            if (db_xref_uri.match(/Orphanet_/)) {
+              if (!orpha_ids.includes(db_xref_uri)) {
+                data.db_xrefs.orphanet.push({
+                  url: db_xref_uri.replace(
+                    'http://www.orpha.net/ORDO/Orphanet_',
+                    'https://www.orpha.net/en/disease/detail/'
+                  ),
+                  id: db_xref_uri
+                    .split("/")
+                    .slice(-1)[0]
+                    .replace('Orphanet_', '')
+                });
+                orpha_ids.push(db_xref_uri);
+              }
+            } else if (db_xref_uri.match(/omim/)) {
+              if (!omim_ids.includes(db_xref_uri)) {
+                data.db_xrefs.omim.push({
+                  url: db_xref_uri.replace('omim', 'mim'),
+                  id: db_xref_uri.split("/").slice(-1)[0]
+                });
+                omim_ids.push(db_xref_uri);
+              }
+            }
+          } else {
+            data.db_xrefs = { orphanet: [], omim: [] };
+            if (db_xref_uri.match(/Orphanet_/)) {
+              data.db_xrefs.orphanet.push({
+                url: db_xref_uri.replace(
+                  'http://www.orpha.net/ORDO/Orphanet_',
+                  'https://www.orpha.net/en/disease/detail/'
+                ),
+                id: db_xref_uri
+                  .split("/")
+                  .slice(-1)[0]
+                  .replace('Orphanet_', '')
+              });
+              orpha_ids.push(db_xref_uri);
+            } else if (db_xref_uri.match(/omim/)) {
+              data.db_xrefs.omim.push({
+                url: db_xref_uri.replace('omim', 'mim'),
+                id: db_xref_uri.split("/").slice(-1)[0]
+              });
+              omim_ids.push(db_xref_uri);
+            }
+          }
+        }
 
         // mondo_description
         if (rows[i].mondo_description && rows[i].mondo_description.value) {
@@ -536,55 +555,15 @@ WHERE {
         }
       }
     }
- // ordo_desc_rows
-    if (ordo_desc_rows.length > 0) {
-      for (let i = 0; i < ordo_desc_rows.length; i++) {
-        let ordo_uri = null;
-        let desc = null;
-   
-        if (
-          ordo_desc_rows[i].ordo &&
-          ordo_desc_rows[i].ordo.value
-        ) {
-          ordo_uri = ordo_desc_rows[i].ordo.value;
-        }
-        if (
-          ordo_desc_rows[i].desc &&
-          ordo_desc_rows[i].desc.value
-        ) {
-          desc = ordo_desc_rows[i].desc.value;
-        }
-       
-        if (ordo_uri) {
-          if (data.ordo_dif) {
-            if (!ordo_dif.includes(ordo_uri)) {
-              data.ordo_dif.push({
-                uri: ordo_uri,
-                data: desc
-             });
-              ordo_dif.push(ordo_uri);
-            }
-          } else {
-            data.ordo_dif = [];
-            data.ordo_dif.push({
-              uri: ordo_uri,
-              data: desc
-             });
-            ordo_dif.push(ordo_uri);
-          }
-        }
-      }
-    }
-
 
     return data;
   }
 })
 
+
 ```
 
 ## Description
-- 2025/04/08 2024年度後期開発に伴う大幅改変
 - 2025/01/23 エラーに伴い改変、Javascript部分にデータのあるなしの判別を追記
 - 2024/11/22 NANDO改変に伴い修正
 - 2024/08 HPOのinheritanceのデータが変わったことにより、申さんの方で本番環境を修正したため、本番環境よりコピー

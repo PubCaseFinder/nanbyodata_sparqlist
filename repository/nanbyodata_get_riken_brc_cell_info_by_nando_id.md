@@ -24,7 +24,7 @@ PREFIX brso: <http://purl.jp/bio/10/brso/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 SELECT 
 DISTINCT ?id_plain as ?ID 
-?hp as ?Homepage 
+?hp2 as ?Homepage 
 ?cell_label_plain as ?Cell_name 
 ?description_e_plain as ?Description_e
 ?description_j_plain as ?Description_j 
@@ -42,6 +42,8 @@ WHERE {
 	BIND (STR(?cell_label) as ?cell_label_plain)
 	BIND (STR(?description_e) as ?description_e_plain)	
 	BIND (STR(?description_j) as ?description_j_plain)	
+    FILTER CONTAINS(STR(?hp), "=En")
+    BIND(IRI(CONCAT("https://cellbank.brc.riken.jp/cell_bank/CellInfo/?cellNo=",STRBEFORE(STRAFTER(STR(?hp),"cellNo="),"&lang=En")) ) as ?hp2)
   ?donor obo:RO_0000091 ?disease. # <http://purl.obolibrary.org/obo/RO_0000091>
   OPTIONAL {?disease rdfs:seeAlso ?ontology}
   FILTER (CONTAINS(STR(?ontology), "{{nando_id}}"))

@@ -25,7 +25,7 @@ FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/pcf>
 WHERE {
-  ?nando dcterms:identifier "NANDO:1200003"  .
+  ?nando dcterms:identifier "NANDO:{{nando_id}}"  .
   ?nando_sub rdfs:subClassOf* ?nando .
 
   OPTIONAL {
