@@ -33,6 +33,7 @@ WHERE {
     ?mondo oboInOwl:id ?mondo_id
   }
    }
+
 ```
 
 ## `mondo_uri_list` get mondo uri
@@ -113,7 +114,7 @@ WHERE {
     }
   }
 }
-ORDER BY ?hpo_category_name_en ?hpo_label_ja
+ORDER BY ?hpo_id
 ```
 ## Output
 
