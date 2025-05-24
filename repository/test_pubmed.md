@@ -78,8 +78,9 @@ https://rdfportal.org/ncbi/sparql
 ```sparql
 
 PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX prism:<http://prismstandard.org/namespeces/1.2/basic/>
 
-SELECT DISTINCT ?id ?title ?date
+SELECT DISTINCT ?id ?title ?name ?date 
 
 WHERE{
   VALUES ?pmid { {{#each pmid}} <{{this}}> {{/each}} } 
@@ -87,6 +88,7 @@ WHERE{
   GRAPH <http://rdfportal.org/dataset/pubmed> {
     ?pmid dct:identifier ?id;
           dct:title ?title;
+          prism:publicationName ?name;
           dct:issued ?date. }
     }
 
