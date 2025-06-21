@@ -3,7 +3,7 @@
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman mondo exact count
+## `result1` shoman mondo exact count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -26,7 +26,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei mondo exact count
+## `result2` shitei mondo exact count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -49,7 +49,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman mondo close count
+## `result3` shoman mondo close count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -72,7 +72,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei mondo close count
+## `result4` shitei mondo close count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -95,7 +95,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei kegg count
+## `result5` shitei kegg count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -116,7 +116,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman kegg count
+## `result6` shoman kegg count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -137,7 +137,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman omim count
+## `result7`shoman omim count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -164,7 +164,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei omim count
+## `result8` shitei omim count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -191,7 +191,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman medgen count
+## `result9` shoman medgen count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -224,7 +224,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei medgen count
+## `result10` shitei medgen count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -254,7 +254,7 @@ WHERE {
   ?medgen rdfs:seeAlso ?concept .        
 }
 ```
-## shoman ordo count
+## `result11` shoman ordo count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -281,7 +281,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei ordo count
+## `result12` shitei ordo count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -304,4 +304,37 @@ WHERE {
            skos:exactMatch ?exactMatch_disease .
     FILTER (CONTAINS(STR(?exactMatch_disease), "Orphanet"))
    }
+```
+## Output
+```javascript
+({result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12}) => {
+  const namedResults = {
+    name1: result1,
+    name2: result2,
+    name3: result3,
+    name4: result4,
+    name5: result5,
+    name6: result6,
+    name7: result7,
+    name8: result8,
+    name9: result9,
+    name10: result10,
+    name11: result11,
+    name12: result12,
+  };
+
+  const processed = {};
+
+  for (const [name, result] of Object.entries(namedResults)) {
+    const data = result.results.bindings[0];
+    processed[name] = Object.keys(data).reduce((obj, key) => {
+      obj[key] = data[key].value;
+      return obj;
+    }, {});
+  }
+
+  return processed;
+}
+
+
 ```

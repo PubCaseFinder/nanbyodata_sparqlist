@@ -3,7 +3,7 @@
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman mgend count
+## `result1` shoman mgend count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -56,7 +56,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei mgend count
+## `result2` shitei mgend count
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -109,7 +109,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman gene count
+## `result3` shoman gene count
 ```sparql
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -145,7 +145,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shite gene count
+## `result4` shite gene count
 ```sparql
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -181,7 +181,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman hp count
+## `result5` shoman hp count
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -217,7 +217,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei hp count
+## `result6` shitei hp count
 ```sparql
 PREFIX : <http://nanbyodata.jp/ontology/nando#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -253,7 +253,7 @@ WHERE {
 ## Endpoint
 https://knowledge.brc.riken.jp/sparql
 
-## shoman cell count
+## `result7` shoman cell count
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -280,7 +280,7 @@ WHERE {
 ## Endpoint
 https://knowledge.brc.riken.jp/sparql
 
-## shitei cell count
+## `result8` shitei cell count
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -307,7 +307,7 @@ WHERE {
 ## Endpoint
 https://knowledge.brc.riken.jp/sparql
 
-## shoman gene count
+## `result9` shoman gene count
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -334,7 +334,7 @@ WHERE {
 ## Endpoint
 https://knowledge.brc.riken.jp/sparql
 
-## shitei gene count
+## `result10` shitei gene count
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -360,7 +360,7 @@ WHERE {
 ## Endpoint
 https://knowledge.brc.riken.jp/sparql
 
-## shoman mouse count
+## `result11` shoman mouse count
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -386,7 +386,7 @@ WHERE {
 ## Endpoint
 https://knowledge.brc.riken.jp/sparql
 
-## shitei mouse count
+## `result12` shitei mouse count
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -413,7 +413,7 @@ WHERE {
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman description
+## `result13` shoman description
 
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
@@ -440,7 +440,7 @@ WHERE {
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei description
+## `result14` shitei description
 
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
@@ -467,7 +467,7 @@ WHERE {
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman altlabel
+## `result15` shoman altlabel
 
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
@@ -494,7 +494,7 @@ WHERE {
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei altlabel
+## `result16` shitei altlabel
 
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
@@ -521,7 +521,7 @@ WHERE {
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman inheritance
+## `result17` shoman inheritance
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -552,7 +552,7 @@ WHERE{
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei inheritance
+## `result18` shitei inheritance
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -583,7 +583,7 @@ WHERE{
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman genetest
+## `result19` shoman genetest
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -606,7 +606,7 @@ WHERE {
 
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei genetest
+## `result20` shitei genetest
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -624,4 +624,45 @@ WHERE {
   ?s rdfs:seeAlso ?disease.
   FILTER (CONTAINS(STR(?disease), "http://nanbyodata.jp/ontology/NANDO_1"))
 }
+```
+## Output
+```javascript
+({result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12, result13, result14, result15, result16, result17, result18, result19, result20}) => {
+  const namedResults = {
+    name1: result1,
+    name2: result2,
+    name3: result3,
+    name4: result4,
+    name5: result5,
+    name6: result6,
+    name7: result7,
+    name8: result8,
+    name9: result9,
+    name10: result10,
+    name11: result11,
+    name12: result12,
+    name13: result13,
+    name14: result14,
+    name15: result15,
+    name16: result16,
+    name17: result17,
+    name18: result18,
+    name19: result19,
+    name20: result20
+  };
+
+  const processed = {};
+
+  for (const [name, result] of Object.entries(namedResults)) {
+    const data = result.results.bindings[0];
+    processed[name] = Object.keys(data).reduce((obj, key) => {
+      obj[key] = data[key].value;
+      return obj;
+    }, {});
+  }
+
+  return processed;
+}
+
+
 ```

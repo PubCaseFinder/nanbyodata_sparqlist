@@ -3,7 +3,7 @@
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei count
+## `result1` 指定難病疾患数カウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -25,7 +25,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_1"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman count
+## `result2` 小児慢性疾患数カウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -47,7 +47,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_2"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman group count
+## `result3` 小児慢性疾患グループカウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -68,7 +68,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_21"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei group count
+## `result4` 指定難病疾患グループカウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -89,7 +89,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_11"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei group count subclass
+## `result5` 指定難病疾患グループサブクラスカウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -112,7 +112,7 @@ FILTER (CONTAINS(STR(?g), "NANDO_11"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman group count subclass
+## `result6` 小児慢性疾患グループサブクラスカウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -135,7 +135,7 @@ FILTER (CONTAINS(STR(?g), "NANDO_21"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shoman subclass count
+## `result7` 小児慢性疾患サブクラスカウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -156,7 +156,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_22"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei subclass count
+## `result8` 指定難病サブクラスカウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -177,7 +177,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_12"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## shitei description count
+## `result9` 指定難病概要カウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -199,7 +199,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## syoman description count
+## `result10` 小児慢性概要カウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -221,7 +221,7 @@ WHERE {
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## 指定難病の最大値を計算する
+## `result11` 指定難病の最大値を計算する
 ```sparql
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -253,7 +253,7 @@ ORDER BY ?child DESC(?numDescendants)
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## 小満の最大値を計算する
+## `result12` 小児慢性の最大値を計算する
 ```sparql
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -279,3 +279,39 @@ WHERE {
 }
 GROUP BY ?greatGrandchild
 ORDER BY DESC(?numDescendants)
+
+```
+
+## Output
+```javascript
+({result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12}) => {
+  const namedResults = {
+    指定難病疾患数カウント: result1,
+    name2: result2,
+    name3: result3,
+    name4: result4,
+    name5: result5,
+    name6: result6,
+    name7: result7,
+    name8: result8,
+    name9: result9,
+    name10: result10,
+    name11: result11,
+    name12: result12,
+  };
+
+  const processed = {};
+
+  for (const [name, result] of Object.entries(namedResults)) {
+    const data = result.results.bindings[0];
+    processed[name] = Object.keys(data).reduce((obj, key) => {
+      obj[key] = data[key].value;
+      return obj;
+    }, {});
+  }
+
+  return processed;
+}
+
+
+```
