@@ -28,25 +28,30 @@ DISTINCT ?id_plain as ?ID
 ?cell_label_plain as ?Cell_name 
 ?description_e_plain as ?Description_e
 ?description_j_plain as ?Description_j 
-FROM <http://metadb.riken.jp/db/xsearch_cell_brso>
+FROM <http://metadb.riken.jp/db/xsearch_cell_brso> 
+FROM <http://metadb.riken.jp/db/cell_diseaseID>
 WHERE {
-  ?cell dct:identifier ?id;
-    foaf:homepage ?hp;
-    dc:description ?description_e;
-    dc:description ?description_j;
-    rdfs:label ?cell_label;
-    brso:donor ?donor.
-    FILTER(lang(?description_e) = "en")
-    FILTER(lang(?description_j) = "ja")
+ ?cell dct:identifier ?id;
+  foaf:homepage ?hp;
+  dc:description ?description_e;
+  dc:description ?description_j;
+  rdfs:label ?cell_label;
+  brso:donor ?donor.
+  FILTER(lang(?description_e) = "en")
+  FILTER(lang(?description_j) = "ja")
 	BIND (STR(?id) as ?id_plain)
 	BIND (STR(?cell_label) as ?cell_label_plain)
 	BIND (STR(?description_e) as ?description_e_plain)	
 	BIND (STR(?description_j) as ?description_j_plain)	
-    FILTER CONTAINS(STR(?hp), "=En")
-    BIND(IRI(CONCAT("https://cellbank.brc.riken.jp/cell_bank/CellInfo/?cellNo=",STRBEFORE(STRAFTER(STR(?hp),"cellNo="),"&lang=En")) ) as ?hp2)
-  ?donor obo:RO_0000091 ?disease. # <http://purl.obolibrary.org/obo/RO_0000091>
-  OPTIONAL {?disease rdfs:seeAlso ?ontology}
-  FILTER (CONTAINS(STR(?ontology), "{{nando_id}}"))
+  FILTER CONTAINS(STR(?hp), "=En")
+  BIND(IRI(CONCAT("https://cellbank.brc.riken.jp/cell_bank/CellInfo/?cellNo=",STRBEFORE(STRAFTER(STR(?hp),"cellNo="),"&lang=En")) ) as ?hp2)
+ {?donor obo:RO_0000091 ?disease. # <http://purl.obolibrary.org/obo/RO_0000091>
+ OPTIONAL {?disease rdfs:seeAlso ?ontology}
+  }
+	UNION
+ {?cell <http://purl.obolibrary.org/obo/RO_0003301> ?ontology. 
+  }
+ FILTER (CONTAINS(STR(?ontology), "2200865"))
 }
  ORDER BY ?ID
 
@@ -67,4 +72,5 @@ WHERE {
 ## Description
 - NanbyoDataで理研の細胞情報を表示させるために利用しているSPARQListです。
 - 理研のエンドポイントを利用しています。
-- 編集：高月（2024/01/12)
+- 櫛田さんから依頼があり、SPARQLを差し替え（遺伝からの抽出データも含める）
+- 編集：高月（2025/07/23)

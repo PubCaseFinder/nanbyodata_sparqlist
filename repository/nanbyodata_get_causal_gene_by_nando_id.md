@@ -20,7 +20,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
 
 SELECT DISTINCT ?nando_sub ?nando_sub_id ?nando_label_en ?nando_label_ja ?mondo_sub_tier ?mondo_id1
-?mondo_id ?mondo_label_ja ?mondo_label_en ?gene_id ?hgnc_gene_symbol ?ncbi_id ?omim_id 
+?mondo_id ?mondo_label_ja ?mondo_label_en ?gene_id ?hgnc_gene_symbol ?ncbi_id ?omim_id ?source
 FROM <https://nanbyodata.jp/rdf/ontology/nando>
 FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/pcf>
@@ -52,14 +52,21 @@ WHERE {
 
   # Gene 関連
   ?as sio:SIO_000628 ?disease ;
-      sio:SIO_000628 ?gene_id .
+      sio:SIO_000628 ?gene_id ;
+      dcterms:source ?source_url .
+  FILTER (?source_url != <https://search.thegencc.org/download/action/submissions-export-csv>)
+  
   ?disease rdf:type ncit:C7057 .
   ?gene_id sio:SIO_000205 [rdfs:label ?hgnc_gene_symbol] .
   ?gene_id rdf:type ncit:C16612 .
   ?gene_id dcterms:identifier ?ncbi_id .
   ?gene_id rdfs:seeAlso ?omim_id .
+#}
+  BIND(IF(CONTAINS(STR(?source_url), "orphadata"), "Orphadata",
+          IF(CONTAINS(STR(?source_url), "mim2gene_medgen"), "OMIM", CONCAT(?submitter, " (GenCC)"))) AS ?source)
 }
 ORDER BY ?hgnc_gene_symbol
+
 
 ```
 ## Output
@@ -78,6 +85,7 @@ ORDER BY ?hgnc_gene_symbol
       omim_url: d.omim_id.value,
       ncbi_id: d.ncbi_id.value,
       ncbi_url: d.gene_id.value,
+      source:d.source.value,
       mondo_id1: d.mondo_id1.value,
       mondo_id: d.mondo_id.value,
       mondo_label: d.mondo_label_en.value,
@@ -100,7 +108,7 @@ ORDER BY ?hgnc_gene_symbol
 
 ```
 ## Description
-- 2025/04/08 改変
+- 2025/07/23 Sourceを含めたデータに改変
 - 2024/11/22 NANDO改変に伴う変更
 - 2024/10/31 OMIMのURLが変更になったとの事で修正
 - 2024/09/10 MONDOの日本語追加によるSPARLの修正を追加
@@ -108,6 +116,3 @@ ORDER BY ?hgnc_gene_symbol
 - nanbyodata_get_gene_by_nando_id =>  nanbyodata_get_causal_gene_by_nando_id
 - UIで遺伝子データを表示させるためのSPARQListです。
 - NANDOをMONDOに変換し、変換したMONDOを利用して遺伝子関連の情報を取得しています。
-- 編集：高月（2024/01//12)
-
-
