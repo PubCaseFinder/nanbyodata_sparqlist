@@ -89,7 +89,7 @@ FILTER (CONTAINS(STR(?s), "NANDO_11"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## `result5` 指定難病疾患グループサブクラスカウント
+## `result5` 指定難病疾患カウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -112,7 +112,7 @@ FILTER (CONTAINS(STR(?g), "NANDO_11"))
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## `result6` 小児慢性疾患グループサブクラスカウント
+## `result6` 小児慢性疾患カウント
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
@@ -173,55 +173,13 @@ WHERE {
 ?s ?p ?o.
 FILTER (CONTAINS(STR(?s), "NANDO_12"))
 }
-```
-## Endpoint
-https://dev-nanbyodata.dbcls.jp/sparql
 
-## `result9` 指定難病概要カウント
-```sparql
-PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX obo: <http://purl.obolibrary.org/obo/>
-PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
-
-SELECT count(distinct ?sub)
-FROM <https://nanbyodata.jp/rdf/ontology/nando>
-WHERE {
-?sub rdfs:subClassOf+ nando:1000001 .
-?sub dcterms:description ?desc .
-}
 
 ```
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## `result10` 小児慢性概要カウント
-```sparql
-PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX dcterms: <http://purl.org/dc/terms/>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX obo: <http://purl.obolibrary.org/obo/>
-PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
-
-SELECT count(distinct ?sub)
-FROM <https://nanbyodata.jp/rdf/ontology/nando>
-WHERE {
-?sub rdfs:subClassOf+ nando:2000001 .
-?sub dcterms:description ?desc .
-}
-
-```
-## Endpoint
-https://dev-nanbyodata.dbcls.jp/sparql
-
-## `result11` 指定難病の最大値を計算する
+## `result9` 指定難病の最大値を計算する
 ```sparql
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -253,7 +211,7 @@ ORDER BY ?child DESC(?numDescendants)
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## `result12` 小児慢性の最大値を計算する
+## `result10` 小児慢性の最大値を計算する
 ```sparql
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -284,20 +242,18 @@ ORDER BY DESC(?numDescendants)
 
 ## Output
 ```javascript
-({result1, result2, result3, result4, result5, result6, result7, result8, result9, result10, result11, result12}) => {
+({result1, result2, result3, result4, result5, result6, result7, result8, result9, result10}) => {
   const namedResults = {
-    指定難病疾患数カウント: result1,
-    name2: result2,
-    name3: result3,
-    name4: result4,
-    name5: result5,
-    name6: result6,
+    shitei_all: result1,
+    shoman_all: result2,
+    shoman_group: result3,
+    shitei_group: result4,
+    shitei_disease: result5,
+    shoman_disease: result6,
     name7: result7,
     name8: result8,
     name9: result9,
     name10: result10,
-    name11: result11,
-    name12: result12,
   };
 
   const processed = {};

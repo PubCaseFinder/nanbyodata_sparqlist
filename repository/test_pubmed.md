@@ -27,7 +27,7 @@ FROM <https://nanbyodata.jp/rdf/ontology/mondo>
 FROM <https://nanbyodata.jp/rdf/medgen>
 WHERE {
   ?nando a owl:Class ;
-         dcterms:identifier "NANDO:2200317" .
+         dcterms:identifier "NANDO:{{nando_id}}".
   
   OPTIONAL {
     ?nando skos:exactMatch | skos:closeMatch ?mondo ;
@@ -80,7 +80,7 @@ https://rdfportal.org/ncbi/sparql
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX prism:<http://prismstandard.org/namespeces/1.2/basic/>
 
-SELECT DISTINCT ?id ?title ?name ?date 
+SELECT DISTINCT ?pmid ?id ?title ?name ?date 
 
 WHERE{
   VALUES ?pmid { {{#each pmid}} <{{this}}> {{/each}} } 
@@ -91,7 +91,29 @@ WHERE{
           prism:publicationName ?name;
           dct:issued ?date. }
     }
+ORDER BY DESC (?date)
+```
 
+## Output
+```javascript
+({ pmid_data }) => {
+  let tree = [];
+  let uniqueCheck = new Set();
+
+  pmid_data.results.bindings.forEach(d => {
+    tree.push({
+      pmid: d.id.value,
+      url: d.pmid.value,
+      title: d.title.value,
+      magazine: d.name.value,
+      date: d.date.value,
+    });
+
+    uniqueCheck.add(d.pmid.value); //
+  });
+
+  return tree;
+};
 
 
 

@@ -4,8 +4,7 @@
 ## Parameters
 
 * `nando_id` NANDO ID
-  * default: 1200489 
-  * example: 2200856
+  * default: 1200473
 
 ## Endpoint
 
@@ -28,7 +27,7 @@ SELECT DISTINCT
 FROM <https://nanbyodata.jp/rdf/nanbyodata>
 FROM <https://nanbyodata.jp/rdf/pcf>
 WHERE {
-  nando:1200235  sio:SIO_000352 ?blank.
+  nando:{{nando_id}}  sio:SIO_000352 ?blank.
   ?blank rdfs:label ?label;
          rdfs:seeAlso ?gene.
 FILTER(CONTAINS(STR(?gene), "http://identifiers.org/ncbigene/"))
@@ -44,14 +43,29 @@ FILTER(CONTAINS(STR(?gene2), "https://www.genenames.org/data/gene-symbol-report/
 
 ## Output
 ```javascript
-({result})=>{ 
-  return result.results.bindings.map(data => {
-    return Object.keys(data).reduce((obj, key) => {
-      obj[key] = data[key].value;
-      return obj;
-    }, {});
+
+({ result }) => {
+  let tree = [];
+  let uniqueCheck = new Set();
+
+  result.results.bindings.forEach(d => {
+    tree.push({
+      symbol: d.label.value,
+      ncbi: d.gene.value,
+      ncbi_id: d.gene.value.replace("http://identifiers.org/ncbigene/", ""),
+      hgnc: d.gene2.value,
+      hgnc_id: d.gene2.value.replace("https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/", ""),
+      gene_name: d.gene_name.value,
+      gene_description: d.gene_desc.value,
+    });
+
+    uniqueCheck.add(d.label.value);
   });
-}
+
+  return tree;
+};
+
+
 ```
 ## Description
 - 2025/06/23 名称変更
