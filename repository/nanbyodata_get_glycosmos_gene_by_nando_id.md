@@ -2,11 +2,11 @@
 ## Parameters
 * `nando_id` NANDO ID
   * default: 2200093
-  * examples: 1200431、1200147
+  * examples: 1200044、1200147
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
-## `nando2mondo` get mondo_id correspoinding to nando_id
+## `nando2mondo` get mondo_id corresponding to nando_id
 ```sparql
 PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>

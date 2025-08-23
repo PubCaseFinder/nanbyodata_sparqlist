@@ -37,7 +37,7 @@ FILTER(CONTAINS(STR(?gene2), "https://www.genenames.org/data/gene-symbol-report/
         obo:NCIT_C42581 ?gene_desc.
 
   }
-
+LIMIT 3000
 
 ```
 
