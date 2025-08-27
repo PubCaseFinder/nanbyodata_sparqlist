@@ -43,14 +43,28 @@ WHERE {
 
 ## Output
 ```javascript
-({result})=>{ 
-  return result.results.bindings.map(data => {
-    return Object.keys(data).reduce((obj, key) => {
-      obj[key] = data[key].value;
-      return obj;
-    }, {});
+({ result }) => {
+  let tree = [];
+  let uniqueCheck = new Set();
+
+  result.results.bindings.forEach(d => {
+    tree.push({
+      dna: d.dna.value,
+      gene_label: d.gene_label.value,
+      hp: d.hp.value,
+      gene_id: d.gene_id.value,
+      ncbi_gene: d.ncbi_gene.value,
+      gene: d.gene.value,
+      nando: d.nando.value,
+      ncbi_gene_id: d.ncbi_gene.value.replace("http://identifiers.org/ncbigene/", "")
+    });
+
+    // 登録済みとする（ただし geneSymbol が未定義なので注意）
+    uniqueCheck.add(d.gene_label.value); // 例として gene_label を使っています
   });
-}
+
+  return tree;
+};
 ```
 
 ## Description
