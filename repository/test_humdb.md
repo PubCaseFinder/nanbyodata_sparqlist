@@ -16,10 +16,11 @@ PREFIX nando: <http://nanbyodata.jp/ontology/NANDO_>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX sio: <http://semanticscience.org/resource/>
 SELECT *
+FROM <https://nanbyodata.jp/rdf/nanbyodata>
 WHERE {
   ?hum_uri rdfs:seeAlso nando:{{nando_id}} .
   
-  ?hum_uri a ?class_type ;
+  ?hum_uri a sio:SIO_000756 ;
             dcterms:identifier ?hum_id .
   OPTIONAL {
     ?hum_uri rdfs:label ?label_ja .

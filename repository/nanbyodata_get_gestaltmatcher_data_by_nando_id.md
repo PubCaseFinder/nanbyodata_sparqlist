@@ -1,4 +1,4 @@
-# Retrieve GM informations by the given NANDO ID
+# Get gestaltmatcher face image data
 ## Parameters
 * `nando_id` NANDO ID
   * default: 1200922

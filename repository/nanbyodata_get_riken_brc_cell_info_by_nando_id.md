@@ -51,7 +51,7 @@ WHERE {
 	UNION
  {?cell <http://purl.obolibrary.org/obo/RO_0003301> ?ontology. 
   }
- FILTER (CONTAINS(STR(?ontology), "2200865"))
+ FILTER (CONTAINS(STR(?ontology), "{{nando_id}}"))
 }
  ORDER BY ?ID
 
