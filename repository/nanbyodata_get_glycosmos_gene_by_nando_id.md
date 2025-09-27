@@ -142,7 +142,7 @@ PREFIX up: <http://purl.uniprot.org/core/>
 PREFIX go: <http://www.geneontology.org/formats/oboInOwl#>
 
 
-SELECT DISTINCT ?glycogene_id ?gene_idStr  ?description ?go ?go_term_mf 
+SELECT DISTINCT ?glycogene_id ?gene_idStr ?genesymbol ?description ?go ?go_term_mf 
 #(GROUP_CONCAT(DISTINCT ?evidence ; separator = "|") AS ?evidences) 
 (GROUP_CONCAT(DISTINCT ?pmid_id ; separator = ",") AS ?pmid_ids)
 #(GROUP_CONCAT(DISTINCT IRI(?pmid_uri) ; SEPARATOR = ",") AS ?pmid_uris)
@@ -157,6 +157,7 @@ WHERE{
   ?glycogene_id rdfs:seeAlso ?ggdbgene ;
            a glycan:Glycogene ;
            dcterms:description ?description ;
+           rdfs:label ?genesymbol ; #genesymbol
            glycan:has_taxon taxonomy:9606 .
   ?glycogene_id sio:SIO_000255 ?b .
   ?b up:classifiedWith ?go .
@@ -197,9 +198,10 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
       let pmid_link = "";
       let pubmed_ofNum = "";
       
-      //glycosmos geneのリンク
+      //glycosmos geneのリンク, genesymbol
       let glycogene = row.gene_idStr.value;
-      let glycogene_url = "https://glycosmos.org/genes/" + glycogene +"#GeneOntology(GO)";
+      let glycogene_url = "https://glycosmos.org/genes/" + glycogene;
+      let glycogene_go_url = "https://glycosmos.org/genes/" + glycogene +"#GeneOntology(GO)";
       
       //NCBIのリンク
       let ncbi_url = "http://identifiers.org/ncbigene/" + glycogene;
@@ -241,6 +243,7 @@ ORDER BY DESC (?glycogene_id) ?go_term_mf
       return {
         "glycosmosgene": glycogene_url,
         "gene_id": row.gene_idStr?.value || "",
+        "genesymbol": row.genesymbol?.value || "", //genesymbol追加してみた
         "ncbigene_description": row.description?.value || "",
         "ncbi_url": ncbi_url,
         "go_term_mf": row.go_term_mf?.value || "",
