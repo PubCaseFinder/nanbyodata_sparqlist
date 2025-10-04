@@ -22,8 +22,9 @@ prefix ns6: <http://edamontology.org/>
 Prefix skos: <http://www.w3.org/2004/02/skos/core#>
 Prefix NANDO: <http://identifiers.org/NANDO:>
 Prefix dcterms: <http://purl.org/dc/terms/>
+Prefix pcvocab: <http://rdf.ncbi.nlm.nih.gov/pubchem/vocabulary#>
 
-SELECT DISTINCT ?s ?coid ?cid ?label ?id
+SELECT DISTINCT ?s ?coid ?cid ?label ?id ?ref ?title
 WHERE{
   ?s skos:closeMatch|skos:relatedMatch NANDO:{{nando_id}}  .
   ?coid rdf:object ?s.
@@ -31,6 +32,8 @@ WHERE{
   ?cid skos:prefLabel ?label.
   ?cid dcterms:identifier ?id.
   FILTER(contains(str(?cid),"CID"))
+  ?ref pcvocab:discussesAsDerivedByTextMining ?s, ?cid;
+       dcterms:title ?title.
     }
 
 ```
@@ -48,6 +51,8 @@ WHERE{
       label: d.label.value,
       id: d.id.value,
       id_url: "https://pubchem.ncbi.nlm.nih.gov/compound/" + d.id.value,
+      ref_url: d.ref.value,
+      title: d.title.value,
       });
 
     uniqueCheck.add(d.label.value);

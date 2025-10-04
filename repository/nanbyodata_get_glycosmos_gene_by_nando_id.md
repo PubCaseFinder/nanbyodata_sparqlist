@@ -23,11 +23,11 @@ WHERE {
   ?nando_sub rdfs:subClassOf* ?nando.
    OPTIONAL {
     {
-      ?nando skos:closeMatch ?mondo .
+      ?nando_sub skos:closeMatch ?mondo .
     }
     UNION
     {
-      ?nando skos:exactMatch ?mondo .
+      ?nando_sub skos:exactMatch ?mondo .
     }
     ?mondo oboInOwl:id ?mondo_id
   }

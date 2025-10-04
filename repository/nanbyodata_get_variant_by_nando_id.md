@@ -126,8 +126,8 @@ async ({medgen}) => {
           MedGen_link: "http://ncbi.nlm.nih.gov/medgen/" + medgen_cid,
           mondo: mondo,
           mondo_id: mondo.replace("http://purl.obolibrary.org/obo/", ""),
-          num_homozygous: total_aac > 0 ? total_aac : "",
-          num_heterozygous: total_arc > 0 ? total_arc : ""
+          num_homozygous: total_aac > 0 ? total_aac : "No Data",
+          num_heterozygous: total_arc > 0 ? total_arc : "No Data"
         };
       });
   });
@@ -136,6 +136,7 @@ async ({medgen}) => {
 
 ## Description
 - TogoVarの情報をVirtuosoではなくTogoVarAPIから取得するように変更 三橋 (2025/7/10)
+  - num_homozygousとnum_heterozygousはTogoVarに搭載されているデータセットで1以上の数字があれば合計を返します。欠損値が多いのであるデータセットで0であっても「No Data」とします。
 - MedGenのRDFの形式が変わったことによる変更 2024/12/05
 - NANDO改変に伴う変更　2024/11/22
 - APIの名前の変更（2024/06/27)
