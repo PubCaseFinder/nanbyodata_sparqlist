@@ -64,4 +64,5 @@ WHERE{
 
 ```
 ## Description
+- 2025/10/24 API名設定　高月
 - 2025/09/19 first version

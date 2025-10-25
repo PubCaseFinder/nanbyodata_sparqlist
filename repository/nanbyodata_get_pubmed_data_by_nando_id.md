@@ -63,6 +63,7 @@ WHERE {
 
 }
 
+LIMIT 1000
 ```
 ## `pmid`
  ```javascript
@@ -119,4 +120,5 @@ ORDER BY DESC (?date)
 
 ```
 ## Description
+- 2025/10/24 APIの名前を設定　高月
 - 2025/05/15 新規設定　NANDO-MONDO-MedGenからMeGenの文献情報を引っ張ってくる　高月

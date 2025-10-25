@@ -1,4 +1,4 @@
-# Get reference gene
+# Get Japan curated gene
 - マニュアルキュレーションをした遺伝子を表示するためのAPI
 
 ## Parameters
@@ -37,7 +37,7 @@ FILTER(CONTAINS(STR(?gene2), "https://www.genenames.org/data/gene-symbol-report/
         obo:NCIT_C42581 ?gene_desc.
 
   }
-LIMIT 3000
+
 
 ```
 
@@ -68,4 +68,5 @@ LIMIT 3000
 
 ```
 ## Description
+- 2025/10/24 API名変更
 - 2025/06/23 名称変更
