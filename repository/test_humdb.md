@@ -1,14 +1,15 @@
 # Get Human DataBase data by the given NANDO ID
 ## Parameters
 * `nando_id` NANDO ID
-  * default: 2200460
-  * examples: 1200044、2200091
+  * default: 2200461
+  * examples: 1100005、2200091、2200040
 
 ## Endpoint
 https://dev-nanbyodata.dbcls.jp/sparql
 
 ## `nando2humandb` get human database info corresponding to nando_id
 ```sparql
+PREFIX dc: <http://purl.org/dc/elements/1.1/> 
 PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX hum: <https://humandbs.dbcls.jp/>
 PREFIX mondo: <http://purl.obolibrary.org/obo/>
@@ -29,6 +30,14 @@ WHERE {
   OPTIONAL {
     ?hum_uri rdfs:label ?label_en .
     FILTER (lang(?label_en) = "en")
+  }
+  OPTIONAL {
+    ?hum_uri dc:type ?type_study_ja .
+    FILTER (lang(?type_study_ja) = "ja")
+  }
+  OPTIONAL {
+    ?hum_uri dc:type ?type_study_en .
+    FILTER (lang(?type_study_en) = "en")
   }
   OPTIONAL {
     ?hum_uri dcterms:accessRights ?type_data_ja .
@@ -56,6 +65,8 @@ WHERE {
         "hum_id": row.hum_id?.value || "",
         "label_ja": row.label_ja?.value || "",
         "label_en": row.label_en?.value || "",
+        "type_study_ja": row.type_study_ja?.value || "",
+        "type_study_en": row.type_study_en?.value || "",
         "type_data_ja": row.type_data_ja?.value || "",
         "type_data_en": row.type_data_en?.value || ""
         

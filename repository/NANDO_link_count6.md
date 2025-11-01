@@ -1,4 +1,4 @@
-# Get PMID(MedGen) by NANDO ID
+# NANDO_link_count6_PMID
 
 ## Endpoint
 
