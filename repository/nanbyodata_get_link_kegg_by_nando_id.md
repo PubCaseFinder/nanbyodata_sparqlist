@@ -17,6 +17,7 @@ PREFIX dcterms: <http://purl.org/dc/terms/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX obo: <http://purl.obolibrary.org/obo/>
 PREFIX oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+PREFIX kegg: <https://identifiers.org/kegg.disease:> 
 
 SELECT ?nando ?kegg ?kegg_id ?kegg_label_ja ?kegg_label_en ?property
 FROM <https://nanbyodata.jp/rdf/ontology/nando>

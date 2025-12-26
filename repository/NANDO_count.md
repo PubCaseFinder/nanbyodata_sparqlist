@@ -242,26 +242,52 @@ ORDER BY DESC(?numDescendants)
 
 ## Output
 ```javascript
-({result1, result2, result3, result4, result5, result6, result7, result8, result9, result10}) => {
+({
+  result1, result2, result3, result4, result5,
+  result6, result7, result8, result9, result10
+}) => {
   const namedResults = {
-    shitei_all: result1,
-    shoman_all: result2,
-    shoman_group: result3,
-    shitei_group: result4,
-    shitei_disease: result5,
-    shoman_disease: result6,
-    name7: result7,
-    name8: result8,
-    name9: result9,
-    name10: result10,
+    shitei_all:      result1,
+    shoman_all:      result2,
+    shoman_group:    result3,
+    shitei_group:    result4,
+    shitei_disease:  result5,
+    shoman_disease:  result6,
+    name7:           result7,
+    name8:           result8,
+    name9:           result9,   // ★ result9
+    name10:          result10,  // ★ result10
   };
 
   const processed = {};
 
   for (const [name, result] of Object.entries(namedResults)) {
-    const data = result.results.bindings[0];
-    processed[name] = Object.keys(data).reduce((obj, key) => {
-      obj[key] = data[key].value;
+    const bindings = result.results.bindings;
+
+    if (!bindings || bindings.length === 0) {
+      // 結果が無い場合は null を入れておく（必要に応じて変更）
+      processed[name] = null;
+      continue;
+    }
+
+    // まず使う行（row）を決める
+    let row;
+
+    // ★ name9 / name10 だけは numDescendants 最大の行を選ぶ
+    if (name === 'name9' || name === 'name10') {
+      row = bindings.reduce((maxRow, curRow) => {
+        const cur = Number(curRow.numDescendants?.value ?? -Infinity);
+        const max = Number(maxRow.numDescendants?.value ?? -Infinity);
+        return cur > max ? curRow : maxRow;
+      }, bindings[0]);
+    } else {
+      // それ以外は従来通り、先頭の1件
+      row = bindings[0];
+    }
+
+    // 選んだ row から .value だけを取り出す
+    processed[name] = Object.keys(row).reduce((obj, key) => {
+      obj[key] = row[key].value;
       return obj;
     }, {});
   }

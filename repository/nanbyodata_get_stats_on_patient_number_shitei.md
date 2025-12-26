@@ -64,7 +64,8 @@ WHERE{
       num_of_2020: null,
       num_of_2021: null,
       num_of_2022: null,
-      num_of_2023: null
+      num_of_2023: null,
+      num_of_2024: null
     };
     // この行に含まれる年の患者数を更新
     newData[`num_of_${d.year.value}`] = Number(d.num_of_patients.value) || null
