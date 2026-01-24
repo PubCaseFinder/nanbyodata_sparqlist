@@ -74,7 +74,7 @@ PREFIX taxonomy: <http://identifiers.org/taxonomy/>
 
 SELECT DISTINCT
   ?ncbi_id
-  ?glycogene_id
+  ?glycogene
   ?genesymbol
 
 FROM<http://rdf.glycosmos.org/glycogenes> #FROM1
@@ -83,16 +83,16 @@ FROM <http://purl.obolibrary.org/obo/eco.owl> #FROM3
 WHERE {
 #  VALUES ?ncbi_id { {{#each total_ncbigene_id_list}} "{{this}}" {{/each}} }
 
-#  BIND( IRI(CONCAT("http://glycosmos.org/glycogene/", ?ncbi_id)) AS ?glycogene_id )
+#  BIND( IRI(CONCAT("http://glycosmos.org/glycogene/", ?ncbi_id)) AS ?glycogene )
 
   # GlyCosmos に本当に存在する Glycogene だけ残す
-  ?glycogene_id rdfs:seeAlso ?ggdbgene ;
+  ?glycogene rdfs:seeAlso ?ggdbgene ;
            a glycan:Glycogene ;
            dcterms:description ?description ;
            rdfs:label ?genesymbol ; #genesymbol
            glycan:has_taxon taxonomy:9606 .
-           #BIND(IF(isIRI(?glycogene_id),STRAFTER(STR(?glycogene_id),"glycogene/"),STR(?glycogene_id)) AS ?gene_idStr)
-  BIND(STRAFTER(STR(?glycogene_id), "glycogene/") AS ?ncbi_id)
+           #BIND(IF(isIRI(?glycogene),STRAFTER(STR(?glycogene),"glycogene/"),STR(?glycogene)) AS ?gene_idStr)
+  BIND(STRAFTER(STR(?glycogene), "glycogene/") AS ?ncbi_id)
   
 }
 
@@ -106,7 +106,7 @@ WHERE {
 ({
   json({ total_nando2mondo2gene, result3_total }) {
 
-    // 1) GlyCosmos: ncbi_id -> { glycogene_id, gene_symbol }
+    // 1) GlyCosmos: ncbi_id -> { glycogene, gene_symbol }
     const gRows = result3_total.results.bindings;
     const ncbi2gly = new Map();
 
@@ -115,7 +115,7 @@ WHERE {
       if (!ncbi) continue;
 
       ncbi2gly.set(ncbi, {
-        glycogene_id: r.glycogene_id?.value ?? "NA",
+        glycogene: r.glycogene?.value ?? "NA",
         genesymbol: r.genesymbol?.value ?? "NA"
       });
     }
@@ -149,7 +149,7 @@ WHERE {
       
 
       out.push({
-        glycogene_id: glyInfo.glycogene_id,
+        glycogene: glyInfo.glycogene,
         genesymbol: glyInfo.genesymbol,
         ncbi_id: ncbi,
         nando: nandoUri,

@@ -1,4 +1,4 @@
-# Get RIKEN BRC cell data
+# 理研BRC細胞リソース一覧
 
 
 ## Endpoint

@@ -1,4 +1,4 @@
-# Get Japan curated gene
+# 国内マニュアルキュレーション遺伝子リスト
 - マニュアルキュレーションをした遺伝子を表示するためのAPI
 
 ## Endpoint
