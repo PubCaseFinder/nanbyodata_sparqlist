@@ -71,6 +71,84 @@ async ({medgen}) => {
 }
 ```
 
+## `vcv_ids`
+```javascript
+({medgen2togovar}) => {
+  const data = medgen2togovar?.data;
+  if (!Array.isArray(data)) return [];
+
+  const vcv_ids = [];
+  for (const item of data) {
+    const clinvar = item?.external_link?.clinvar;
+    if (!Array.isArray(clinvar)) continue;
+
+    for (const link of clinvar) {
+      const t = link?.title;
+      if (typeof t === "string" && t.length > 0) vcv_ids.push(t);
+    }
+  }
+  return vcv_ids;
+}
+```
+
+## `display_vcv_ids`
+```javascript
+({vcv_ids}) => {
+　console.log(vcv_ids)
+}
+```
+
+## Endpoint
+https://grch38.togovar.org/sparql
+
+## `medgen2clinvar2togovar`
+```sparql
+PREFIX cvo:    <http://purl.jp/bio/10/clinvar/>
+PREFIX dct:    <http://purl.org/dc/terms/>
+PREFIX medgen: <http://ncbi.nlm.nih.gov/medgen/>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sio:    <http://semanticscience.org/resource/>
+PREFIX tgvo:   <http://togovar.biosciencedbc.jp/vocabulary/>
+
+SELECT DISTINCT ?tgv_id ?rs_id ?variant ?title ?condition ?clinvar ?vcv ?type ?med_id ?interpretation
+WHERE {
+  VALUES ?vcv_id { {{#each vcv_ids}} <{{this}}> {{/each}} } 
+
+  GRAPH <http://togovar.org/clinvar> {
+    ?med_id ^dct:references ?_classified_condition .
+
+    ?_classified_condition ^cvo:classified_condition/^cvo:classified_condition_list ?_rcv ;
+      rdfs:label ?condition .
+
+    ?_rcv cvo:rcv_classifications/cvo:germline_classification/cvo:description/cvo:description ?interpretation ;
+      cvo:rcv_classifications/cvo:germline_classification/cvo:description/cvo:date_last_evaluated ?last_evaluated ;
+      ^cvo:rcv_accession/^cvo:rcv_list/^cvo:classified_record ?clinvar .
+
+    ?clinvar a cvo:VariationArchiveType ;
+      rdfs:label ?title ;
+      cvo:accession ?vcv ;
+      cvo:variation_id ?vid .
+     # cvo:interpreted_record/cvo:review_status ?review_status ;
+     # cvo:interpreted_record/sio:SIO_000628/dct:references ?dbsnp .
+
+    BIND(STR(?vid) AS ?variation_id)
+
+    # ?dbsnp rdfs:seeAlso ?rs_id ;
+    #  dct:source ?dbname .
+    # FILTER(?dbname IN ("dbSNP"))
+  }
+
+  GRAPH <http://togovar.org/variant/annotation/clinvar> {
+    ?variant dct:identifier ?variation_id .
+   }
+
+  GRAPH <http://togovar.org/variant> {
+   OPTIONAL{ ?variant dct:identifier ?tgv_id ;
+                      rdf:type ?type.}
+  }
+}               
+```
+
 ## `result`
 ```javascript
 ({target, medgen, medgen2togovar, nando2mondo2medgen}) => {
