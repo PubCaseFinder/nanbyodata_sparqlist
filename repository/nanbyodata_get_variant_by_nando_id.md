@@ -112,7 +112,7 @@ PREFIX tgvo:   <http://togovar.biosciencedbc.jp/vocabulary/>
 
 SELECT DISTINCT ?tgv_id ?rs_id ?variant ?title ?condition ?clinvar ?vcv ?type ?med_id ?interpretation
 WHERE {
-  VALUES ?vcv_id { {{#each vcv_ids}} <{{this}}> {{/each}} } 
+  VALUES ?vcv_id { {{#each vcv_ids}} "{{this}}" {{/each}} } 
 
   GRAPH <http://togovar.org/clinvar> {
     ?med_id ^dct:references ?_classified_condition .

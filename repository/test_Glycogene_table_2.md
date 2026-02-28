@@ -20,6 +20,7 @@ SELECT DISTINCT
   ?nando
   ?nando_id
   ?nando_label
+  ?nando_label_en
   ?mondo
   ?mondo_id
   ?nando2mondo_match
@@ -33,6 +34,12 @@ WHERE {
   #日本語ラベルを取得
   ?nando rdfs:label ?nando_label .
   FILTER(lang(?nando_label) = "ja")
+  
+    # 英語ラベル
+  OPTIONAL {
+    ?nando rdfs:label ?nando_label_en .
+    FILTER(lang(?nando_label_en) = "en")
+  }
 
   # NANDO -> MONDO
   #?nando (skos:exactMatch | skos:closeMatch) ?mondo .
@@ -156,6 +163,7 @@ WHERE {
         nando_id: r.nando_id?.value ?? "NA",
         nando_category, // ★追加列
         nando_label: r.nando_label?.value ?? "NA",
+        nando_label_en: r.nando_label_en?.value ?? "NA" ,
         mondo_id: r.mondo_id?.value ?? "NA",
         nando2mondo_match: match_type
       });
