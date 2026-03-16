@@ -111,7 +111,7 @@ If a file exists in the production environment but not in the development enviro
 ### 3. Release Execution with Specified MD Files  
 Specify the MD files you wish to release. This copies the code from the development environment and releases it to the production environment.  
 During release, the development SARQL endpoint is replaced with the production environment endpoint.  
-Before: https://dev-nanbyodata.dbcls.jp/sparql
+Before: https://dev-nanbyodata.dbcls.jp/sparql  
 After: https://nanbyodata.jp/sparql
 
 ```
