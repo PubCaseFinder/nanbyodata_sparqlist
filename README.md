@@ -91,8 +91,8 @@ sh bin/diff_with_dev.sh
 
 If there are differences, the following message will be displayed for each file.
 ```
-開発環境のコードとEndpoint以外の差異があります. 'pcf_get_omim_data_by_omim_id.md'.
-次のコマンドで本番環境にコピーしてリリースできます。 sh bin/release_product_from_dev.sh pcf_get_omim_data_by_omim_id.md
+開発環境のコードとEndpoint以外の差異があります. 'nanbyodata_get_mgend_variant_by_nando_id.md'.
+次のコマンドで本番環境にコピーしてリリースできます。 sh bin/release_product_from_dev.sh nanbyodata_get_mgend_variant_by_nando_id.md
 ```
 
 If you want to check what the differences are, you can check the diff results with the following command.
@@ -100,22 +100,22 @@ If you want to check what the differences are, you can check the diff results wi
 `tmp/repository/***.md.diff`
 
 ```
-cat tmp/repository/pcf_get_omim_data_by_omim_id.md.diff
+cat tmp/repository/nanbyodata_get_mgend_variant_by_nando_id.md.diff
 ```
 
 If a file exists in the production environment but not in the development environment, the following message will be displayed:
 ```
-開発環境にはない md ファイルです. 'test_pubtator3.md'
+開発環境にはない md ファイルです. 'aaaa.md'
 ```
 
 ### 3. Release Execution with Specified MD Files  
 Specify the MD files you wish to release. This copies the code from the development environment and releases it to the production environment.  
 During release, the development SARQL endpoint is replaced with the production environment endpoint.  
-Before: https://dev-pubcasefinder.dbcls.jp/sparql  
-After: https://pubcasefinder.dbcls.jp/sparql
+Before: https://dev-nanbyodata.dbcls.jp/sparql
+After: https://nanbyodata.jp/sparql
 
 ```
-sh bin/release_product_from_dev.sh pcf_get_omim_data_by_omim_id.md
+sh bin/release_product_from_dev.sh nanbyodata_get_mgend_variant_by_nando_id.md
 ```
 If the release succeeds, the following message will appear. Push to git as needed.  
 You may release multiple files before performing a git commit & push.
@@ -136,7 +136,6 @@ sh bin/check_dev_endopoint.sh
 If there are lines containing "/sparql" and "dev", the following message will be displayed.
 
 ```
-本番環境の SPARQList に開発環境用 Endpoint が書かれている可能性があります.
-pcf_get_omim_data_by_omim_id.md, pcf_get_orpha_data_by_orpha_id.md,
+開発環境用Endpointが書かれている可能性があります. nanbyodata_get_mgend_variant_by_nando_id.md 'https://dev-pubcasefinder.dbcls.jp/sparql/'
 ```
 
